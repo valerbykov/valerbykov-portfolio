@@ -22,7 +22,7 @@ const T = {
       ["Product rescue", "I step into a stalled build as a PM with hands: restore control over scope, unblock delivery, and get the release out."],
     ],
     flagEyebrow: "Flagship — built solo",
-    flagTitle: "Friends' Padel League",
+    flagTitle: "PadelPack",
     flagDesc: "A live league app I conceived, designed, built, and shipped alone: automated scheduling, live standings, player profiles, guest invites, and a natural-language admin layer with a human confirmation step before anything is written to the database.",
     flagStatus: "iOS + Android — in internal store testing (Google Play & App Store)",
     caseLink: "View case study →",
@@ -80,7 +80,7 @@ const T = {
       ["Разбор застрявших проектов", "Вхожу как PM с руками: навожу порядок в скоупе, снимаю блокеры и довожу до релиза."],
     ],
     flagEyebrow: "Флагман — сделано в одиночку",
-    flagTitle: "Падел-лига для своих",
+    flagTitle: "PadelPack",
     flagDesc: "Живое приложение лиги, которое я придумал, спроектировал, собрал и запустил один: автоматическое расписание, живые рейтинги, профили игроков, гостевые инвайты и NL-интерфейс администратора с подтверждением человеком перед любой записью в базу.",
     flagStatus: "iOS + Android — на внутреннем тестировании в сторах (Google Play и App Store)",
     caseLink: "Смотреть кейс →",
@@ -203,6 +203,8 @@ const css = `
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(232,163,61,.5)}70%{box-shadow:0 0 0 12px rgba(232,163,61,0)}100%{box-shadow:0 0 0 0 rgba(232,163,61,0)}}
 .caselink{display:block;margin-top:4px;font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent);background:none;border:0;cursor:pointer;padding:0}
 .caselink:hover{color:var(--accent-soft)}
+.livelink{display:inline-block;margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent)}
+.livelink:hover{color:var(--accent-soft)}
 
 /* background grid */
 .bg-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line)}
@@ -336,6 +338,7 @@ function Home({ t, go }) {
             <div className="chips">{STACK.map((s) => <span className="chip" key={s}>{s}</span>)}</div>
             <div className="status"><span className="pulse" />{t.flagStatus}</div>
             <button className="caselink" onClick={() => go("padel")}>{t.caseLink}</button>
+            <a className="caselink livelink" href="https://padelpack.app" target="_blank" rel="noopener">padelpack.app ↗</a>
           </div>
         </div>
       </section>
@@ -373,7 +376,7 @@ function Padel({ t, go }) {
         <button className="backb" onClick={() => go("home")}>{t.caseBack}</button>
         <span className="eyebrow">{t.caseEyebrow}</span>
         <h1 className="disp">{t.flagTitle}</h1>
-        <div className="csub">{t.caseSubtitle}</div>
+        <div className="csub">{t.caseSubtitle} · <a className="livelink" href="https://padelpack.app" target="_blank" rel="noopener">padelpack.app ↗</a></div>
         <p className="ov">{t.caseOverview}</p>
 
         <div className="shots reveal">
@@ -459,6 +462,4 @@ export default function App() {
           <span className="mono">{t.footerBuilt}</span>
         </div>
       </footer>
-    </div>
-  );
-}
+    </di
