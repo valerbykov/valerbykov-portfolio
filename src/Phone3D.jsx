@@ -2,14 +2,9 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
 /* Interactive 3D phone for the hero (Obsidian Kinetic design).
-   Behind the phone floats a "plexus" network — drifting nodes that link up
-   with thin lines when they come close, like a living network diagram.
+   VARIANT: wireframe "network globe" — a slowly spinning geodesic sphere
+   behind the phone with glowing nodes at its vertices and an orbit ring.
    Lazy-loaded so three.js stays out of the main bundle. */
-
-const COUNT = 46;          // network nodes
-const LINK_DIST = 0.95;    // max distance for a node-to-node link
-const BX = 2.2, BY = 2.6;  // half-extents of the drift box
-const ZC = -1.4, BZ = 1.0; // z-center and half-depth (kept behind the phone)
 
 export default function Phone3D({ onFail }) {
   const ref = useRef(null);
@@ -52,40 +47,49 @@ export default function Phone3D({ onFail }) {
     screen.position.z = 0.11;
     phoneBody.add(screen);
 
-    /* ---- plexus network ---- */
-    const net = new THREE.Group();
-    scene.add(net);
+    /* ---- network globe ---- */
+    /* R and the ring radius must fit the narrowest container: at z=-1.3 the
+       visible half-width is ~2.7 (mobile 300x380), so the ring stays ≤2.55 */
+    const R = 2.3;
+    const RING = R * 1.1;
+    const tilt = new THREE.Group();          // static tilt, like a real globe stand
+    tilt.position.z = -1.3;
+    tilt.rotation.z = 0.18;
+    tilt.rotation.x = 0.22;
+    scene.add(tilt);
+    const globe = new THREE.Group();         // this one spins
+    tilt.add(globe);
 
-    const positions = new Float32Array(COUNT * 3);
-    const colors = new Float32Array(COUNT * 3);
-    const velocities = [];
-    const teal = new THREE.Color(0xb1ccc6);
-    const amber = new THREE.Color(0xffc16c);
-    for (let i = 0; i < COUNT; i++) {
-      positions[i * 3] = (Math.random() * 2 - 1) * BX;
-      positions[i * 3 + 1] = (Math.random() * 2 - 1) * BY;
-      positions[i * 3 + 2] = ZC + (Math.random() * 2 - 1) * BZ;
-      velocities.push(new THREE.Vector3(
-        (Math.random() - 0.5) * 0.004,
-        (Math.random() - 0.5) * 0.004,
-        (Math.random() - 0.5) * 0.002
-      ));
-      const c = i % 6 === 0 ? amber : teal; // a few amber accent nodes
-      colors[i * 3] = c.r; colors[i * 3 + 1] = c.g; colors[i * 3 + 2] = c.b;
+    const geoSphere = new THREE.IcosahedronGeometry(R, 1);
+    const wireMat = new THREE.MeshBasicMaterial({ color: 0x8fa9a3, wireframe: true, transparent: true, opacity: 0.2 });
+    globe.add(new THREE.Mesh(geoSphere, wireMat));
+
+    /* glowing nodes on the lattice vertices */
+    const nodesMat = new THREE.PointsMaterial({ color: 0xb1ccc6, size: 0.09, transparent: true, opacity: 0.85 });
+    globe.add(new THREE.Points(geoSphere, nodesMat));
+
+    /* amber accent nodes scattered on the surface */
+    const accGeo = new THREE.SphereGeometry(0.055, 8, 8);
+    const accMat = new THREE.MeshBasicMaterial({ color: 0xffc16c });
+    for (let i = 0; i < 8; i++) {
+      const dir = new THREE.Vector3().randomDirection();
+      const acc = new THREE.Mesh(accGeo, accMat);
+      acc.position.copy(dir.multiplyScalar(R));
+      globe.add(acc);
     }
 
-    const pointsGeo = new THREE.BufferGeometry();
-    pointsGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    pointsGeo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-    const pointsMat = new THREE.PointsMaterial({ size: 0.07, vertexColors: true, transparent: true, opacity: 0.9 });
-    net.add(new THREE.Points(pointsGeo, pointsMat));
+    /* orbit ring around the equator */
+    const ringGeo = new THREE.TorusGeometry(RING, 0.008, 6, 96);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0xe8a33d, transparent: true, opacity: 0.35 });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.rotation.x = Math.PI / 2;
+    tilt.add(ring);
 
-    const maxSegs = (COUNT * (COUNT - 1)) / 2;
-    const linePositions = new Float32Array(maxSegs * 6);
-    const linesGeo = new THREE.BufferGeometry();
-    linesGeo.setAttribute("position", new THREE.BufferAttribute(linePositions, 3));
-    const linesMat = new THREE.LineBasicMaterial({ color: 0x8fa9a3, transparent: true, opacity: 0.22 });
-    net.add(new THREE.LineSegments(linesGeo, linesMat));
+    /* satellite dot running along the ring */
+    const satGeo = new THREE.SphereGeometry(0.05, 8, 8);
+    const satMat = new THREE.MeshBasicMaterial({ color: 0xffc16c });
+    const sat = new THREE.Mesh(satGeo, satMat);
+    tilt.add(sat);
 
     let mouseX = 0, mouseY = 0;
     const onMouse = (e) => {
@@ -109,40 +113,9 @@ export default function Phone3D({ onFail }) {
       phoneBody.rotation.y = THREE.MathUtils.lerp(phoneBody.rotation.y, mouseX * 0.4, 0.05);
       phoneBody.rotation.x = THREE.MathUtils.lerp(phoneBody.rotation.x, -mouseY * 0.2, 0.05);
 
-      /* drift nodes inside the box, bounce off the walls */
-      for (let i = 0; i < COUNT; i++) {
-        const v = velocities[i];
-        let x = positions[i * 3] + v.x;
-        let y = positions[i * 3 + 1] + v.y;
-        let z = positions[i * 3 + 2] + v.z;
-        if (x > BX || x < -BX) v.x *= -1;
-        if (y > BY || y < -BY) v.y *= -1;
-        if (z > ZC + BZ || z < ZC - BZ) v.z *= -1;
-        positions[i * 3] = x; positions[i * 3 + 1] = y; positions[i * 3 + 2] = z;
-      }
-      pointsGeo.attributes.position.needsUpdate = true;
-
-      /* re-link nearby nodes */
-      let seg = 0;
-      for (let i = 0; i < COUNT; i++) {
-        for (let j = i + 1; j < COUNT; j++) {
-          const dx = positions[i * 3] - positions[j * 3];
-          const dy = positions[i * 3 + 1] - positions[j * 3 + 1];
-          const dz = positions[i * 3 + 2] - positions[j * 3 + 2];
-          if (dx * dx + dy * dy + dz * dz < LINK_DIST * LINK_DIST) {
-            linePositions.set([
-              positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2],
-              positions[j * 3], positions[j * 3 + 1], positions[j * 3 + 2],
-            ], seg * 6);
-            seg++;
-          }
-        }
-      }
-      linesGeo.setDrawRange(0, seg * 2);
-      linesGeo.attributes.position.needsUpdate = true;
-
-      /* gentle sway of the whole network */
-      net.rotation.y = Math.sin(time * 0.0001) * 0.12;
+      globe.rotation.y += 0.0018;
+      const a = time * 0.0004;
+      sat.position.set(Math.cos(a) * RING, 0, Math.sin(a) * RING);
 
       renderer.render(scene, camera);
     };
@@ -155,8 +128,10 @@ export default function Phone3D({ onFail }) {
       container.removeChild(renderer.domElement);
       bodyGeometry.dispose(); bodyMaterial.dispose();
       screenGeometry.dispose(); screenMaterial.dispose();
-      pointsGeo.dispose(); pointsMat.dispose();
-      linesGeo.dispose(); linesMat.dispose();
+      geoSphere.dispose(); wireMat.dispose(); nodesMat.dispose();
+      accGeo.dispose(); accMat.dispose();
+      ringGeo.dispose(); ringMat.dispose();
+      satGeo.dispose(); satMat.dispose();
       renderer.dispose();
       renderer.forceContextLoss();
     };
