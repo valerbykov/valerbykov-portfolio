@@ -1,4 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, lazy, Suspense } from "react";
+
+const Phone3D = lazy(() => import("./Phone3D.jsx"));
 
 /* ---------------- content ---------------- */
 const T = {
@@ -155,7 +157,8 @@ const css = `
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 :root{color-scheme:dark}
-.pf{background:var(--surface);color:var(--text);font-family:'Manrope',system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100dvh;overflow-x:hidden}
+.pf{background:transparent;color:var(--text);font-family:'Manrope',system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100dvh;overflow-x:hidden}
+.gbg{position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;opacity:.4}
 .pf a,.pf button{touch-action:manipulation}
 .pf a{color:inherit;text-decoration:none}
 .skip{position:absolute;left:-9999px;top:0;z-index:100;background:var(--accent);color:var(--on-accent);font-weight:700;padding:10px 18px}
@@ -202,21 +205,25 @@ html{scroll-behavior:smooth}
 .photo-card .pc-mono i{font-style:normal;color:var(--text)}
 .photo-card .pc-name{font-family:'Oswald',sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:.08em;font-size:1.05rem;color:var(--text)}
 .photo-card .pc-role{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.08em;color:var(--sec);text-transform:uppercase;border-top:1px solid var(--line);padding-top:14px;width:100%}
+.phone3d{width:100%;max-width:420px;height:500px;cursor:grab}
+.phone3d:active{cursor:grabbing}
+.phone3d canvas{display:block}
 
 /* process strip */
 .process{position:relative;margin-top:56px;background:var(--container-low);border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden}
-.process .shader{position:absolute;inset:0;width:100%;height:100%;opacity:.5;pointer-events:none}
-.process::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,23,20,.35),rgba(0,23,20,.15));pointer-events:none}
 .process .wrap{position:relative;z-index:2;padding-top:34px;padding-bottom:34px}
 .pipe{position:relative;height:40px}
 .pipe .track,.pipe .flow{position:absolute;left:12.5%;right:12.5%;top:50%;height:2px;margin-top:-1px}
 .pipe .track{background:var(--variant)}
-.pipe .flow{background:var(--accent-deep);transform:scaleX(0);transform-origin:left center;animation:draw 1.6s .3s ease forwards}
+.pipe .flow{background:var(--accent);transform:scaleX(0);transform-origin:left center}
+.process.go .flow{animation:draw 1.5s .2s ease-out forwards}
 @keyframes draw{to{transform:scaleX(1)}}
-.pipe .node{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--accent);box-shadow:0 0 15px var(--glow);opacity:0;transform:scale(0);animation:pop .4s ease forwards}
-.pipe .n1{left:12.5%;animation-delay:.5s}.pipe .n2{left:37.5%;animation-delay:.85s}.pipe .n3{left:62.5%;animation-delay:1.2s}
-.pipe .n4{left:87.5%;animation-delay:1.55s;width:20px;height:20px;margin:-10px 0 0 -10px;border:3px solid var(--surface);outline:2px solid var(--accent)}
+.pipe .node{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--accent);opacity:0;transform:scale(0)}
+.process.go .node{animation:pop .4s ease forwards,pulseGlow 2s ease-in-out infinite}
+.pipe .n1{left:12.5%;animation-delay:.4s,.8s}.pipe .n2{left:37.5%;animation-delay:.7s,1.1s}.pipe .n3{left:62.5%;animation-delay:1s,1.4s}
+.pipe .n4{left:87.5%;animation-delay:1.3s,1.7s;width:20px;height:20px;margin:-10px 0 0 -10px;border:3px solid var(--surface);outline:2px solid var(--accent)}
 @keyframes pop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 6px rgba(255,193,108,.35)}50%{box-shadow:0 0 18px rgba(255,193,108,.75)}}
 .stages{display:grid;grid-template-columns:repeat(4,1fr);margin-top:6px}
 .stage{text-align:center}
 .stage .n{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--sec)}
@@ -322,10 +329,15 @@ html{scroll-behavior:smooth}
 
 .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s,transform .6s}
 .reveal.in{opacity:1;transform:none}
+.rvl{display:block;overflow:hidden}
+.rvl>span{display:block;transform:translateY(105%);transition:transform .8s cubic-bezier(.16,1,.3,1)}
+.rvl.in>span{transform:none}
+.kin{transition:transform .5s cubic-bezier(.16,1,.3,1),border-color .25s,opacity .6s;transform-style:preserve-3d;will-change:transform}
 
 @media(max-width:760px){
   .hero-grid{grid-template-columns:1fr;gap:26px}
   .photo-img,.photo-card{max-width:280px}
+  .phone3d{height:380px;max-width:300px;margin:0 auto}
   .cards,.bg-grid,.cblocks{grid-template-columns:1fr}
   .flag-grid{grid-template-columns:1fr}
   .phone{max-width:220px;margin-top:10px}
@@ -336,44 +348,25 @@ html{scroll-behavior:smooth}
   html{scroll-behavior:auto}
   .pf *{animation:none!important;transition:none!important}
   .pipe .flow{transform:none}.pipe .node{opacity:1;transform:none}.reveal{opacity:1;transform:none}
+  .rvl>span{transform:none}
 }
 `;
 
-/* ---------------- kinetic shader (Obsidian Kinetic background) ---------------- */
-const FRAG = `precision highp float;
-varying vec2 v_texCoord;
-uniform float u_time;
-
-float random(vec2 st){return fract(sin(dot(st.xy,vec2(12.9898,78.233)))*43758.5453123);}
-float noise(vec2 st){
-  vec2 i=floor(st); vec2 f=fract(st);
-  float a=random(i); float b=random(i+vec2(1.0,0.0));
-  float c=random(i+vec2(0.0,1.0)); float d=random(i+vec2(1.0,1.0));
-  vec2 u=f*f*(3.0-2.0*f);
-  return mix(a,b,u.x)+(c-a)*u.y*(1.0-u.x)+(d-b)*u.x*u.y;
-}
+/* ---------------- global kinetic background (Obsidian Kinetic) ---------------- */
+const WAVE_FRAG = `precision highp float;
+uniform float t;
+uniform vec2 r;
 void main(){
-  vec2 st=v_texCoord;
-  float n1=noise(st*3.0+u_time*0.2);
-  float n2=noise(st*6.0-u_time*0.4+n1);
-  vec3 color1=vec3(0.0,0.09,0.08);
-  vec3 color2=vec3(0.14,0.24,0.23);
-  vec3 accent=vec3(0.91,0.64,0.24);
-  float mixFactor=smoothstep(0.3,0.7,n2);
-  vec3 finalColor=mix(color1,color2,mixFactor);
-  float glint=pow(smoothstep(0.45,0.5,n2),10.0);
-  finalColor=mix(finalColor,accent,glint*0.15);
-  gl_FragColor=vec4(finalColor,1.0);
+  vec2 uv=gl_FragCoord.xy/r;
+  float n=sin(uv.x*10.0+t)*cos(uv.y*10.0+t);
+  vec3 col=mix(vec3(0.0,0.09,0.08),vec3(0.01,0.15,0.13),n*0.5+0.5);
+  gl_FragColor=vec4(col,1.0);
 }`;
 
-const VERT = `attribute vec2 a_position;
-varying vec2 v_texCoord;
-void main(){
-  v_texCoord=a_position*0.5+0.5;
-  gl_Position=vec4(a_position,0.0,1.0);
-}`;
+const WAVE_VERT = `attribute vec2 p;
+void main(){gl_Position=vec4(p,0.0,1.0);}`;
 
-function KineticShader() {
+function GlobalWaves() {
   const ref = useRef(null);
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -382,15 +375,6 @@ function KineticShader() {
     const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
     if (!gl) return;
 
-    const syncSize = () => {
-      const w = canvas.clientWidth || 1280;
-      const h = canvas.clientHeight || 240;
-      if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
-    };
-    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(syncSize) : null;
-    ro?.observe(canvas);
-    syncSize();
-
     const cs = (type, src) => {
       const s = gl.createShader(type);
       gl.shaderSource(s, src);
@@ -398,42 +382,68 @@ function KineticShader() {
       return s;
     };
     const prog = gl.createProgram();
-    gl.attachShader(prog, cs(gl.VERTEX_SHADER, VERT));
-    gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, FRAG));
+    gl.attachShader(prog, cs(gl.VERTEX_SHADER, WAVE_VERT));
+    gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, WAVE_FRAG));
     gl.linkProgram(prog);
     gl.useProgram(prog);
     const buf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
-    const pos = gl.getAttribLocation(prog, "a_position");
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
+    const pos = gl.getAttribLocation(prog, "p");
     gl.enableVertexAttribArray(pos);
     gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
-    const uTime = gl.getUniformLocation(prog, "u_time");
+    const tLoc = gl.getUniformLocation(prog, "t");
+    const rLoc = gl.getUniformLocation(prog, "r");
 
     let raf;
-    const render = (t) => {
-      gl.viewport(0, 0, canvas.width, canvas.height);
-      if (uTime) gl.uniform1f(uTime, t * 0.001);
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    const render = (time) => {
+      const w = window.innerWidth, h = window.innerHeight;
+      if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+      gl.viewport(0, 0, w, h);
+      if (tLoc) gl.uniform1f(tLoc, time * 0.0005);
+      if (rLoc) gl.uniform2f(rLoc, w, h);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
       raf = requestAnimationFrame(render);
     };
     raf = requestAnimationFrame(render);
 
     /* no loseContext() here: React StrictMode re-runs the effect on the same
        canvas, and a lost context can't be re-acquired via getContext() */
-    return () => {
-      cancelAnimationFrame(raf);
-      ro?.disconnect();
-    };
+    return () => cancelAnimationFrame(raf);
   }, []);
-  return <canvas ref={ref} className="shader" aria-hidden="true" />;
+  return <canvas ref={ref} className="gbg" aria-hidden="true" />;
+}
+
+/* ---------------- hero: interactive 3D phone (lazy three.js) ---------------- */
+function HeroPhone({ t }) {
+  const [fallback, setFallback] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+  const onFail = useCallback(() => setFallback(true), []);
+
+  if (fallback) return <Photo t={t} />;
+  return (
+    <Suspense fallback={<div className="phone3d" aria-hidden="true" />}>
+      <Phone3D onFail={onFail} />
+    </Suspense>
+  );
 }
 
 /* ---------------- small components ---------------- */
 function Process({ stages }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (es) => es.forEach((e) => { if (e.isIntersecting) { el.classList.add("go"); io.disconnect(); } }),
+      { threshold: 0.3 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
   return (
-    <div className="process" aria-hidden="true">
-      <KineticShader />
+    <div className="process" ref={ref} aria-hidden="true">
       <div className="wrap">
         <div className="pipe">
           <div className="track" />
@@ -474,25 +484,57 @@ function useReveal() {
       (es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }),
       { threshold: 0.12 }
     );
-    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+    document.querySelectorAll(".reveal, .rvl").forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, []);
+}
+
+/* 3D tilt that follows the cursor on .kin cards */
+function useKinetic() {
+  useEffect(() => {
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const cards = Array.from(document.querySelectorAll(".kin"));
+    const handlers = cards.map((card) => {
+      const move = (e) => {
+        const rect = card.getBoundingClientRect();
+        /* normalized by card size: max ±6° regardless of card dimensions */
+        const rx = -((e.clientY - rect.top) / rect.height - 0.5) * 12;
+        const ry = ((e.clientX - rect.left) / rect.width - 0.5) * 12;
+        card.style.transform = `translateY(-4px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+      };
+      const leave = () => { card.style.transform = ""; };
+      card.addEventListener("mousemove", move);
+      card.addEventListener("mouseleave", leave);
+      return { card, move, leave };
+    });
+    return () => handlers.forEach(({ card, move, leave }) => {
+      card.removeEventListener("mousemove", move);
+      card.removeEventListener("mouseleave", leave);
+    });
+  }, []);
+}
+
+/* masked slide-up text reveal */
+function Rv({ children, className = "" }) {
+  return <span className={`rvl ${className}`}><span>{children}</span></span>;
 }
 
 /* ---------------- home ---------------- */
 function Home({ t, go }) {
   useReveal();
+  useKinetic();
   return (
     <>
       <header className="hero">
         <div className="wrap">
           <div className="hero-grid">
             <div>
-              <span className="eyebrow">{t.heroEyebrow}</span>
-              <h1 className="disp">{t.heroLead}<span className="accent">{t.heroAccent}</span>{t.heroTail}</h1>
-              <p className="sub">{t.heroSub1}<b>{t.heroSub2}</b></p>
+              <Rv className="eyebrow">{t.heroEyebrow}</Rv>
+              <h1 className="disp"><Rv>{t.heroLead}<span className="accent">{t.heroAccent}</span>{t.heroTail}</Rv></h1>
+              <p className="sub"><Rv>{t.heroSub1}<b>{t.heroSub2}</b></Rv></p>
             </div>
-            <Photo t={t} />
+            <HeroPhone t={t} />
           </div>
         </div>
         <Process stages={t.stages} />
@@ -500,10 +542,10 @@ function Home({ t, go }) {
 
       <section className="sec" id="work">
         <div className="wrap">
-          <div className="sec-head reveal"><span className="eyebrow">{t.workEyebrow}</span><h2>{t.workTitle}</h2></div>
+          <div className="sec-head"><Rv className="eyebrow">{t.workEyebrow}</Rv><h2><Rv>{t.workTitle}</Rv></h2></div>
           <div className="cards">
             {t.services.map(([h, p], i) => (
-              <div className="card reveal" key={i}>
+              <div className="card reveal kin" key={i}>
                 <span className="idx">0{i + 1}</span>
                 <h3>{h}</h3><p>{p}</p>
               </div>
@@ -517,8 +559,8 @@ function Home({ t, go }) {
           <div className="flag reveal">
             <div className="flag-grid">
               <div>
-                <span className="eyebrow">{t.flagEyebrow}</span>
-                <h3>{t.flagTitle}</h3>
+                <Rv className="eyebrow">{t.flagEyebrow}</Rv>
+                <h3><Rv>{t.flagTitle}</Rv></h3>
                 <p>{t.flagDesc}</p>
                 <div className="chips">{STACK.map((s) => <span className="chip" key={s}>{s}</span>)}</div>
                 <div className="status"><span className="pulse" />{t.flagStatus}</div>
@@ -540,13 +582,13 @@ function Home({ t, go }) {
         <div className="wrap">
           <div className="bg-grid">
             <div className="bg-list reveal">
-              <span className="eyebrow">{t.bgEyebrow}</span>
-              <h2 className="disp" style={{ fontSize: "clamp(1.6rem,4vw,2.5rem)", fontWeight: 600, margin: "8px 0 22px", lineHeight: 1.2 }}>{t.bgTitle}</h2>
+              <Rv className="eyebrow">{t.bgEyebrow}</Rv>
+              <h2 className="disp" style={{ fontSize: "clamp(1.6rem,4vw,2.5rem)", fontWeight: 600, margin: "8px 0 22px", lineHeight: 1.2 }}><Rv>{t.bgTitle}</Rv></h2>
               {t.bgCells.map(([k, v], i) => (
                 <div className="item" key={i}><div className="k">{k}</div><div className="v">{v}</div></div>
               ))}
             </div>
-            <div className="fit-card reveal">
+            <div className="fit-card reveal kin">
               <div>
                 <h4>{t.fitBest}</h4>
                 <p>{t.fitBestText}</p>
@@ -562,8 +604,8 @@ function Home({ t, go }) {
 
       <section className="sec contact" id="contact">
         <div className="wrap">
-          <span className="eyebrow reveal">{t.contactEyebrow}</span>
-          <h2 className="disp reveal">{t.contactTitle}</h2>
+          <Rv className="eyebrow">{t.contactEyebrow}</Rv>
+          <h2 className="disp"><Rv>{t.contactTitle}</Rv></h2>
           <a className="cta reveal" href="mailto:hi@valerbykov.com">hi@valerbykov.com</a>
           <p className="alt reveal">
             {t.contactAlt1}<a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer">Telegram</a>
@@ -663,6 +705,7 @@ export default function App() {
   return (
     <div className="pf">
       <style>{css}</style>
+      <GlobalWaves />
       <a className="skip" href="#main">{lang === "ru" ? "К содержимому" : "Skip to content"}</a>
       <nav className="nav">
         <div className="wrap nav-in">
