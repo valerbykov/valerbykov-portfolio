@@ -10,8 +10,7 @@ const T = {
     heroTail: " them.",
     heroSub1: "I turn ideas into working apps on an AI-assisted stack — ",
     heroSub2: "scoped, built, and launched to the App Store by one person.",
-    photoLabel: "Add your photo",
-    photoHint: "public/photo.jpg",
+    photoRole: "Idea → App Store",
     stages: ["Idea", "Build", "Launch", "App Store"],
     workEyebrow: "What I do",
     workTitle: "Shipping, end to end",
@@ -68,8 +67,7 @@ const T = {
     heroTail: " их до релиза.",
     heroSub1: "Превращаю идеи в работающие приложения на AI-стеке — ",
     heroSub2: "один человек ставит задачу, собирает и доводит до App Store.",
-    photoLabel: "Место под фото",
-    photoHint: "public/photo.jpg",
+    photoRole: "Идея → App Store",
     stages: ["Идея", "Сборка", "Запуск", "App Store"],
     workEyebrow: "Что делаю",
     workTitle: "Довожу до конца, целиком",
@@ -122,6 +120,9 @@ const T = {
 
 const STACK = ["Vite", "React", "Supabase", "Postgres · RLS", "Edge Functions", "Storage", "Capacitor"];
 
+/* fill in when the profile is live; empty string hides the line */
+const UPWORK_URL = "";
+
 const SHOTS = [1, 2, 3, 4, 5, 6, 7].map((n) => `/shot${n}.jpg`);
 
 /* ---------------- styles ---------------- */
@@ -132,8 +133,13 @@ const css = `
   --line:rgba(242,237,227,.12); --line-strong:rgba(242,237,227,.28); --maxw:1080px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-.pf{background:var(--ink);color:var(--paper);font-family:'Manrope',system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden}
+html{scroll-behavior:smooth}
+:root{color-scheme:dark}
+.pf{background:var(--ink);color:var(--paper);font-family:'Manrope',system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100dvh;overflow-x:hidden}
+.pf a,.pf button{touch-action:manipulation}
 .pf a{color:inherit;text-decoration:none}
+.skip{position:absolute;left:-9999px;top:0;z-index:100;background:var(--accent);color:var(--ink);font-weight:700;padding:10px 18px;border-radius:0 0 8px 0}
+.skip:focus{left:0}
 .pf ::selection{background:var(--accent);color:var(--ink)}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
 .disp{font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase}
@@ -147,11 +153,12 @@ const css = `
 .brand{font-family:'Oswald',sans-serif;font-weight:700;font-size:1.15rem;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:.55rem;cursor:pointer;background:none;border:0;color:var(--paper)}
 .brand .bd{width:9px;height:9px;border-radius:50%;background:var(--accent)}
 .nav-r{display:flex;gap:1.4rem;align-items:center}
-.nav-r a{font-size:.86rem;color:var(--muted);transition:color .2s}
+.nav-r a{font-size:.86rem;color:var(--muted);transition:color .2s;padding:12px 4px}
 .nav-r a:hover{color:var(--paper)}
 .pf a:focus-visible,.pf button:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:2px}
 .toggle{display:inline-flex;border:1px solid var(--line-strong);border-radius:999px;overflow:hidden;font-family:'JetBrains Mono',monospace;font-size:.72rem}
-.toggle button{background:none;border:0;color:var(--muted);padding:6px 11px;cursor:pointer;letter-spacing:.05em}
+.toggle button{background:none;border:0;color:var(--muted);padding:6px 11px;cursor:pointer;letter-spacing:.05em;position:relative}
+.toggle button::after{content:"";position:absolute;inset:-9px -1px}
 .toggle button.on{background:var(--accent);color:var(--ink);font-weight:700}
 
 /* hero */
@@ -160,19 +167,24 @@ const css = `
 .hero h1{font-size:clamp(2.6rem,7vw,5.4rem);line-height:.94;letter-spacing:.01em;margin:20px 0 24px;max-width:16ch}
 .hero .sub{font-size:clamp(1.02rem,2vw,1.28rem);max-width:44ch;font-weight:300;color:var(--paper)}
 .hero .sub b{font-weight:600}
-.photo{aspect-ratio:4/5;border:1.5px dashed var(--line-strong);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--muted);background:linear-gradient(160deg,var(--ink-2),var(--panel));text-align:center;padding:20px}
-.photo .pl{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:1.05rem;color:var(--paper)}
-.photo .ph{font-family:'JetBrains Mono',monospace;font-size:.72rem}
-.photo .ic{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--muted);display:flex;align-items:center;justify-content:center;margin-bottom:4px}
+.photo-img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:16px;border:1px solid var(--line-strong)}
+.photo-card{position:relative;aspect-ratio:4/5;border:1px solid var(--line-strong);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(160deg,var(--ink-2),var(--panel));text-align:center;padding:20px;overflow:hidden}
+.photo-card::before{content:"";position:absolute;inset:10px;border:1px solid var(--line);border-radius:10px;pointer-events:none}
+.photo-card .pc-mono{font-family:'Oswald',sans-serif;font-weight:700;font-size:clamp(3.4rem,8vw,5.2rem);line-height:1;letter-spacing:.04em;color:var(--paper)}
+.photo-card .pc-mono i{font-style:normal;color:var(--accent)}
+.photo-card .pc-name{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:.95rem;color:var(--paper)}
+.photo-card .pc-role{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.08em;color:var(--muted)}
 
 /* pipeline */
 .pipeline{margin:52px 0 6px}
-.pipeline svg{display:block;width:100%;height:60px;overflow:visible}
-.track{stroke:var(--line-strong);stroke-width:2;fill:none}
-.flow{stroke:var(--accent);stroke-width:2;fill:none;stroke-dasharray:1000;stroke-dashoffset:1000;animation:draw 1.6s .3s ease forwards}
-@keyframes draw{to{stroke-dashoffset:0}}
-.node{fill:var(--ink);stroke:var(--accent);stroke-width:2;opacity:0;transform-box:fill-box;transform-origin:center;animation:pop .4s ease forwards}
-.node.n1{animation-delay:.5s}.node.n2{animation-delay:.85s}.node.n3{animation-delay:1.2s}.node.n4{animation-delay:1.55s;fill:var(--accent)}
+.pipe{position:relative;height:44px}
+.pipe .track,.pipe .flow{position:absolute;left:12.5%;right:12.5%;top:50%;height:2px;margin-top:-1px}
+.pipe .track{background:var(--line-strong)}
+.pipe .flow{background:var(--accent);transform:scaleX(0);transform-origin:left center;animation:draw 1.6s .3s ease forwards}
+@keyframes draw{to{transform:scaleX(1)}}
+.pipe .node{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--ink);border:2px solid var(--accent);opacity:0;transform:scale(0);animation:pop .4s ease forwards}
+.pipe .n1{left:12.5%;animation-delay:.5s}.pipe .n2{left:37.5%;animation-delay:.85s}.pipe .n3{left:62.5%;animation-delay:1.2s}
+.pipe .n4{left:87.5%;animation-delay:1.55s;background:var(--accent);width:16px;height:16px;margin:-8px 0 0 -8px}
 @keyframes pop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
 .stages{display:grid;grid-template-columns:repeat(4,1fr);margin-top:4px}
 .stage{text-align:center}
@@ -181,14 +193,16 @@ const css = `
 .stage:last-child .l{color:var(--accent)}
 
 /* sections */
-.sec{padding:clamp(52px,8vh,92px) 0;border-top:1px solid var(--line)}
+.sec{padding:clamp(52px,8vh,92px) 0;border-top:1px solid var(--line);scroll-margin-top:64px}
 .sec-head{display:flex;align-items:baseline;gap:1rem;margin-bottom:34px;flex-wrap:wrap}
 .sec-head h2{font-size:clamp(1.5rem,4vw,2.5rem);letter-spacing:.02em;line-height:1}
 
 /* rows */
-.row{display:grid;grid-template-columns:44px 1fr;gap:20px;padding:24px 0;border-top:1px solid var(--line);align-items:start}
+.row{display:grid;grid-template-columns:44px 1fr;gap:20px;padding:24px 12px;margin:0 -12px;border-top:1px solid var(--line);align-items:start;border-radius:10px;transition:background .25s}
+.row:hover{background:rgba(242,237,227,.03)}
 .row:first-child{border-top:none}
-.row .idx{font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:.85rem;padding-top:5px}
+.row .idx{font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:.85rem;padding-top:5px;transition:transform .25s}
+.row:hover .idx{transform:translateX(4px)}
 .row h3{font-size:1.24rem;font-weight:700;margin-bottom:6px}
 .row p{color:var(--muted);max-width:60ch;font-weight:300}
 
@@ -197,7 +211,8 @@ const css = `
 .flag h3{font-size:clamp(1.7rem,5vw,2.9rem);line-height:.96;margin:12px 0 16px;letter-spacing:.02em}
 .flag p{font-weight:300;max-width:62ch;margin-bottom:20px}
 .chips{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:22px}
-.chip{font-family:'JetBrains Mono',monospace;font-size:.74rem;padding:6px 11px;border:1px solid var(--line-strong);border-radius:999px;color:var(--muted)}
+.chip{font-family:'JetBrains Mono',monospace;font-size:.74rem;padding:6px 11px;border:1px solid var(--line-strong);border-radius:999px;color:var(--muted);transition:border-color .25s,color .25s}
+.chip:hover{border-color:var(--accent);color:var(--paper)}
 .status{display:inline-flex;align-items:center;gap:10px;font-size:.92rem;color:var(--accent-soft);margin-bottom:22px}
 .status .pulse{width:9px;height:9px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(232,163,61,.5)}70%{box-shadow:0 0 0 12px rgba(232,163,61,0)}100%{box-shadow:0 0 0 0 rgba(232,163,61,0)}}
@@ -208,7 +223,8 @@ const css = `
 
 /* background grid */
 .bg-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line)}
-.cell{background:var(--ink);padding:24px}
+.cell{background:var(--ink);padding:24px;transition:background .25s}
+.cell:hover{background:var(--ink-2)}
 .cell .k{font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase}
 .cell .v{font-size:1.02rem;margin-top:8px;font-weight:300}
 .fit{margin-top:26px;color:var(--muted);font-size:.95rem;font-weight:300;max-width:72ch;font-style:italic}
@@ -218,6 +234,7 @@ const css = `
 .contact h2{font-size:clamp(2rem,7vw,4.6rem);line-height:.94;margin-bottom:26px;white-space:pre-line}
 .cta{display:inline-block;background:var(--accent);color:var(--ink);font-weight:700;font-size:1.02rem;padding:15px 30px;border-radius:999px;transition:transform .18s,box-shadow .18s}
 .cta:hover{transform:translateY(-2px);box-shadow:0 10px 30px -10px rgba(232,163,61,.6)}
+.cta:active{transform:translateY(0) scale(.98)}
 .alt{margin-top:20px;color:var(--muted);font-size:.92rem}
 .alt a{color:var(--paper);border-bottom:1px solid var(--line-strong)}
 .alt a:hover{border-color:var(--accent)}
@@ -232,7 +249,8 @@ const css = `
 .case .csub{color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:.9rem;margin-bottom:26px}
 .case .ov{font-size:clamp(1.05rem,2vw,1.3rem);font-weight:300;max-width:60ch;margin-bottom:40px}
 .shots{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:48px}
-.shot-img{display:block;width:100%;height:auto;border-radius:20px;border:1px solid var(--line);background:var(--ink-2)}
+.shot-img{display:block;width:100%;height:auto;aspect-ratio:562/1232;object-fit:cover;border-radius:20px;border:1px solid var(--line);background:var(--ink-2);transition:transform .3s,border-color .3s}
+.shot-img:hover{transform:translateY(-4px);border-color:var(--line-strong)}
 .cblocks{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);margin-bottom:36px}
 .cblock{background:var(--ink);padding:26px 24px}
 .cblock h4{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.03em;font-size:1.15rem;margin-bottom:8px}
@@ -254,23 +272,21 @@ const css = `
 }
 @media(max-width:440px){.shots{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
   .pf *{animation:none!important;transition:none!important}
-  .flow{stroke-dashoffset:0}.node{opacity:1}.reveal{opacity:1;transform:none}
+  .pipe .flow{transform:none}.pipe .node{opacity:1;transform:none}.reveal{opacity:1;transform:none}
 }
 `;
 
 /* ---------------- small components ---------------- */
 function Pipeline({ stages }) {
-  const xs = [125, 375, 625, 875];
   return (
     <div className="pipeline" aria-hidden="true">
-      <svg viewBox="0 0 1000 40" preserveAspectRatio="none">
-        <line className="track" x1="125" y1="20" x2="875" y2="20" />
-        <line className="flow" x1="125" y1="20" x2="875" y2="20" />
-        {xs.map((x, i) => (
-          <circle key={i} className={`node n${i + 1}`} cx={x} cy="20" r={i === 3 ? 8 : 7} />
-        ))}
-      </svg>
+      <div className="pipe">
+        <div className="track" />
+        <div className="flow" />
+        {[1, 2, 3, 4].map((n) => <span key={n} className={`node n${n}`} />)}
+      </div>
       <div className="stages">
         {stages.map((s, i) => (
           <div className="stage" key={i}>
@@ -283,6 +299,20 @@ function Pipeline({ stages }) {
   );
 }
 
+function Photo({ t }) {
+  const [hasPhoto, setHasPhoto] = useState(true);
+  if (hasPhoto) {
+    return <img className="photo-img" src="/photo.jpg" alt="Valeriy Bykov" width="480" height="600" decoding="async" onError={() => setHasPhoto(false)} />;
+  }
+  return (
+    <div className="photo-card" aria-hidden="true">
+      <div className="pc-mono">VB<i>.</i></div>
+      <div className="pc-name">Valeriy Bykov</div>
+      <div className="pc-role">{t.photoRole}</div>
+    </div>
+  );
+}
+
 function useReveal() {
   useEffect(() => {
     const io = new IntersectionObserver(
@@ -291,7 +321,7 @@ function useReveal() {
     );
     document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
     return () => io.disconnect();
-  });
+  }, []);
 }
 
 /* ---------------- home ---------------- */
@@ -307,11 +337,7 @@ function Home({ t, go }) {
               <h1 className="disp">{t.heroLead}<span className="accent">{t.heroAccent}</span>{t.heroTail}</h1>
               <p className="sub">{t.heroSub1}<b>{t.heroSub2}</b></p>
             </div>
-            <div className="photo">
-              <div className="ic">▲</div>
-              <div className="pl">{t.photoLabel}</div>
-              <div className="ph">{t.photoHint}</div>
-            </div>
+            <Photo t={t} />
           </div>
           <Pipeline stages={t.stages} />
         </div>
@@ -360,7 +386,7 @@ function Home({ t, go }) {
           <span className="eyebrow reveal">{t.contactEyebrow}</span>
           <h2 className="disp reveal">{t.contactTitle}</h2>
           <a className="cta reveal" href="mailto:hi@valerbykov.com">hi@valerbykov.com</a>
-          <p className="alt reveal">{t.contactAlt1}<a href="#" target="_blank" rel="noopener">Upwork</a>{t.contactAlt2}</p>
+          {UPWORK_URL && <p className="alt reveal">{t.contactAlt1}<a href={UPWORK_URL} target="_blank" rel="noopener noreferrer">Upwork</a>{t.contactAlt2}</p>}
         </div>
       </section>
     </>
@@ -381,7 +407,7 @@ function Padel({ t, go }) {
 
         <div className="shots reveal">
           {SHOTS.map((src, i) => (
-            <img className="shot-img" key={src} src={src} alt={`${t.caseShotLabel} ${i + 1}`} loading="lazy" />
+            <img className="shot-img" key={src} src={src} alt={`PadelPack — ${t.caseShotLabel} ${i + 1}`} width="562" height="1232" loading="lazy" decoding="async" />
           ))}
         </div>
 
@@ -407,10 +433,22 @@ function Padel({ t, go }) {
 }
 
 /* ---------------- app ---------------- */
+function initialLang() {
+  if (typeof window === "undefined") return "en";
+  const saved = localStorage.getItem("pf-lang");
+  if (saved === "en" || saved === "ru") return saved;
+  return navigator.language?.toLowerCase().startsWith("ru") ? "ru" : "en";
+}
+
 export default function App() {
-  const [lang, setLang] = useState("en");
+  const [lang, setLang] = useState(initialLang);
   const [view, setView] = useState(() => (typeof window !== "undefined" && window.location.hash === "#/padel" ? "padel" : "home"));
   const t = T[lang];
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    localStorage.setItem("pf-lang", lang);
+  }, [lang]);
 
   useEffect(() => {
     const id = "pf-fonts";
@@ -437,6 +475,7 @@ export default function App() {
   return (
     <div className="pf">
       <style>{css}</style>
+      <a className="skip" href="#main">{lang === "ru" ? "К содержимому" : "Skip to content"}</a>
       <nav className="nav">
         <div className="wrap nav-in">
           <button className="brand" onClick={() => go("home")}><span className="bd" />Valeriy&nbsp;Bykov</button>
@@ -444,17 +483,19 @@ export default function App() {
             {view === "home" && <>
               <a href="#work" className="hide-sm">{t.nav.work}</a>
               <a href="#project" className="hide-sm">{t.nav.project}</a>
-              <a href="#contact" className="hide-sm">{t.nav.contact}</a>
+              <a href="#contact">{t.nav.contact}</a>
             </>}
             <div className="toggle" role="group" aria-label="Language">
-              <button className={lang === "en" ? "on" : ""} onClick={() => setLang("en")}>EN</button>
-              <button className={lang === "ru" ? "on" : ""} onClick={() => setLang("ru")}>RU</button>
+              <button className={lang === "en" ? "on" : ""} aria-pressed={lang === "en"} onClick={() => setLang("en")}>EN</button>
+              <button className={lang === "ru" ? "on" : ""} aria-pressed={lang === "ru"} onClick={() => setLang("ru")}>RU</button>
             </div>
           </div>
         </div>
       </nav>
 
-      {view === "home" ? <Home t={t} go={go} /> : <Padel t={t} go={go} />}
+      <main id="main">
+        {view === "home" ? <Home t={t} go={go} /> : <Padel t={t} go={go} />}
+      </main>
 
       <footer className="foot">
         <div className="wrap">
