@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 /* ---------------- content ---------------- */
 const T = {
@@ -24,7 +24,7 @@ const T = {
     flagTitle: "PadelPack",
     flagDesc: "A live league app I conceived, designed, built, and shipped alone: automated scheduling, live standings, player profiles, guest invites, and a natural-language admin layer with a human confirmation step before anything is written to the database.",
     flagStatus: "iOS + Android — in internal store testing (Google Play & App Store)",
-    caseLink: "View case study →",
+    caseLink: "View case study",
     bgEyebrow: "Background",
     bgTitle: "Management meets making",
     bgCells: [
@@ -34,14 +34,14 @@ const T = {
       ["Tooling", "AI-native development as a daily driver, not an experiment"],
     ],
     fitBest: "Best fit:",
-    fitBestText: " MVPs, PWAs, cross-platform mobile via Capacitor, internal tools, and AI automation. ",
+    fitBestText: "MVPs, PWAs, cross-platform mobile via Capacitor, internal tools, and AI automation.",
     fitNo: "Not my lane:",
-    fitNoText: " large performance- or security-critical engineering that needs a senior software engineer — and I'll tell you so up front rather than waste your budget.",
+    fitNoText: "large performance- or security-critical engineering that needs a senior software engineer — and I'll tell you so up front rather than waste your budget.",
     contactEyebrow: "Let's talk",
     contactTitle: "Have something\nto ship?",
     contactAlt1: "Or message me on ",
     contactAlt2: ". Based remote · working across RU & international.",
-    footerBuilt: "Built solo — of course.",
+    footerBuilt: "Shipped with precision. Built solo — of course.",
     /* case study */
     caseBack: "← Back to home",
     caseEyebrow: "Case study · solo product",
@@ -88,7 +88,7 @@ const T = {
     flagTitle: "PadelPack",
     flagDesc: "Живое приложение лиги, которое я придумал, спроектировал, собрал и запустил один: автоматическое расписание, живые рейтинги, профили игроков, гостевые инвайты и NL-интерфейс администратора с подтверждением человеком перед любой записью в базу.",
     flagStatus: "iOS + Android — на внутреннем тестировании в сторах (Google Play и App Store)",
-    caseLink: "Смотреть кейс →",
+    caseLink: "Смотреть кейс",
     bgEyebrow: "Опыт",
     bgTitle: "Управление плюс руки",
     bgCells: [
@@ -98,9 +98,9 @@ const T = {
       ["Инструменты", "AI-разработка как ежедневная работа, а не эксперимент"],
     ],
     fitBest: "Хорошо подхожу:",
-    fitBestText: " MVP, PWA, кроссплатформенные мобильные на Capacitor, внутренние инструменты и AI-автоматизация. ",
+    fitBestText: "MVP, PWA, кроссплатформенные мобильные на Capacitor, внутренние инструменты и AI-автоматизация.",
     fitNo: "Не мой профиль:",
-    fitNoText: " нагруженная или security-critical инженерия, которой нужен сильный software-инженер — скажу об этом сразу, а не потрачу бюджет впустую.",
+    fitNoText: "нагруженная или security-critical инженерия, которой нужен сильный software-инженер — скажу об этом сразу, а не потрачу бюджет впустую.",
     contactEyebrow: "Давай обсудим",
     contactTitle: "Есть что\nзапустить?",
     contactAlt1: "Или напиши в ",
@@ -140,164 +140,195 @@ const UPWORK_URL = "";
 
 const SHOTS = [1, 2, 3, 4, 5, 7].map((n) => `/shot${n}.jpg`);
 
-/* ---------------- styles ---------------- */
+/* ---------------- styles · Obsidian Kinetic ---------------- */
 const css = `
 :root{
-  --ink:#0A2623; --ink-2:#0F332F; --panel:#12403A;
-  --paper:#F2EDE3; --muted:#8FA9A3; --accent:#E8A33D; --accent-soft:#f0c078;
-  --line:rgba(242,237,227,.12); --line-strong:rgba(242,237,227,.28); --maxw:1080px;
+  --surface:#001714; --surface-deep:#00110f;
+  --container-low:#04201d; --container:#072421; --container-high:#132e2b; --container-highest:#1f3936;
+  --raised:#0D2E2B; --variant:#1f3936;
+  --text:#cbe9e3; --text-soft:#d6c4b0; --sec:#b1ccc6;
+  --accent:#ffc16c; --accent-deep:#e8a33d; --on-accent:#2a1800;
+  --line:rgba(143,169,163,.15); --line-strong:rgba(143,169,163,.35);
+  --glow:rgba(232,163,61,.6);
+  --maxw:1280px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 :root{color-scheme:dark}
-.pf{background:var(--ink);color:var(--paper);font-family:'Manrope',system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100dvh;overflow-x:hidden}
+.pf{background:var(--surface);color:var(--text);font-family:'Manrope',system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100dvh;overflow-x:hidden}
 .pf a,.pf button{touch-action:manipulation}
 .pf a{color:inherit;text-decoration:none}
-.skip{position:absolute;left:-9999px;top:0;z-index:100;background:var(--accent);color:var(--ink);font-weight:700;padding:10px 18px;border-radius:0 0 8px 0}
+.skip{position:absolute;left:-9999px;top:0;z-index:100;background:var(--accent);color:var(--on-accent);font-weight:700;padding:10px 18px}
 .skip:focus{left:0}
-.pf ::selection{background:var(--accent);color:var(--ink)}
-.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+.pf ::selection{background:var(--accent);color:var(--surface)}
+.pf ::-webkit-scrollbar{width:6px}
+.pf ::-webkit-scrollbar-track{background:var(--surface)}
+.pf ::-webkit-scrollbar-thumb{background:var(--variant)}
+.pf ::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
 .disp{font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase}
-.eyebrow{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
-.accent{color:var(--accent)}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;color:var(--sec)}
+.accent{color:var(--accent);font-style:italic}
 .mono{font-family:'JetBrains Mono',monospace}
 
 /* nav */
-.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:rgba(10,38,35,.72);border-bottom:1px solid var(--line)}
+.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:rgba(0,23,20,.8);border-bottom:1px solid var(--line)}
 .nav-in{display:flex;align-items:center;justify-content:space-between;height:64px}
-.brand{font-family:'Oswald',sans-serif;font-weight:700;font-size:1.15rem;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:.55rem;cursor:pointer;background:none;border:0;color:var(--paper)}
-.brand .bd{width:9px;height:9px;border-radius:50%;background:var(--accent)}
+.brand{font-family:'Oswald',sans-serif;font-weight:700;font-size:1.1rem;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:.55rem;cursor:pointer;background:none;border:0;color:var(--accent)}
+.brand .bd{width:9px;height:9px;background:var(--accent);box-shadow:0 0 10px var(--glow)}
 .nav-r{display:flex;gap:1.4rem;align-items:center}
-.nav-r a{font-size:.86rem;color:var(--muted);transition:color .2s;padding:12px 4px}
-.nav-r a:hover{color:var(--paper)}
-.pf a:focus-visible,.pf button:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:2px}
-.toggle{display:inline-flex;border:1px solid var(--line-strong);border-radius:999px;overflow:hidden;font-family:'JetBrains Mono',monospace;font-size:.72rem}
-.toggle button{background:none;border:0;color:var(--muted);padding:6px 11px;cursor:pointer;letter-spacing:.05em;position:relative}
+.nav-r a{font-family:'JetBrains Mono',monospace;font-size:.78rem;letter-spacing:.05em;text-transform:uppercase;color:var(--text);transition:color .2s;padding:12px 2px}
+.nav-r a:hover{color:var(--accent)}
+.pf a:focus-visible,.pf button:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.toggle{display:inline-flex;border:1px solid var(--line-strong);overflow:hidden;font-family:'JetBrains Mono',monospace;font-size:.72rem}
+.toggle button{background:none;border:0;color:var(--sec);padding:6px 11px;cursor:pointer;letter-spacing:.05em;position:relative}
 .toggle button::after{content:"";position:absolute;inset:-9px -1px}
-.toggle button.on{background:var(--accent);color:var(--ink);font-weight:700}
+.toggle button.on{background:var(--accent-deep);color:var(--on-accent);font-weight:700}
 
 /* hero */
 .hero{padding:clamp(56px,10vh,120px) 0 32px;position:relative;overflow:hidden}
-.court{position:absolute;top:-6%;right:-140px;height:115%;pointer-events:none;user-select:none}
 .hero .wrap{position:relative}
-.hero-grid{display:grid;grid-template-columns:1.4fr .9fr;gap:40px;align-items:center}
-.hero h1{font-size:clamp(2.6rem,7vw,5.4rem);line-height:.94;letter-spacing:.01em;margin:20px 0 24px;max-width:16ch}
-.hero .sub{font-size:clamp(1.02rem,2vw,1.28rem);max-width:44ch;font-weight:300;color:var(--paper)}
-.hero .sub b{font-weight:600}
-.photo-img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:16px;border:1px solid var(--line-strong)}
-.photo-card{position:relative;aspect-ratio:4/5;border:1px solid var(--line-strong);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(160deg,var(--ink-2),var(--panel));text-align:center;padding:20px;overflow:hidden}
-.photo-card::before{content:"";position:absolute;inset:10px;border:1px solid var(--line);border-radius:10px;pointer-events:none}
-.photo-card .pc-mono{font-family:'Oswald',sans-serif;font-weight:700;font-size:clamp(3.4rem,8vw,5.2rem);line-height:1;letter-spacing:.04em;color:var(--paper)}
-.photo-card .pc-mono i{font-style:normal;color:var(--accent)}
-.photo-card .pc-name{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:.95rem;color:var(--paper)}
-.photo-card .pc-role{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.08em;color:var(--muted)}
+.hero-grid{display:grid;grid-template-columns:1.5fr .8fr;gap:40px;align-items:center}
+.hero h1{font-size:clamp(2.7rem,7vw,5.25rem);line-height:.96;letter-spacing:-.01em;margin:20px 0 24px;max-width:17ch}
+.hero .sub{font-size:clamp(1.02rem,2vw,1.14rem);max-width:46ch;font-weight:400;color:var(--text-soft)}
+.hero .sub b{font-weight:600;color:var(--text)}
+.photo-img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;border:1px solid var(--line)}
+.photo-card{position:relative;aspect-ratio:3/4;border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:var(--raised);text-align:center;padding:28px;overflow:hidden}
+.photo-card::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,193,108,.05),transparent 60%);pointer-events:none}
+.photo-card .tick{position:absolute;width:10px;height:10px;pointer-events:none}
+.photo-card .tick.tl{top:8px;left:8px;border-top:1px solid rgba(255,193,108,.35);border-left:1px solid rgba(255,193,108,.35)}
+.photo-card .tick.br{bottom:8px;right:8px;border-bottom:1px solid rgba(255,193,108,.35);border-right:1px solid rgba(255,193,108,.35)}
+.photo-card .pc-mono{font-family:'Oswald',sans-serif;font-weight:700;font-size:clamp(3.4rem,8vw,4.6rem);line-height:1;letter-spacing:.02em;color:var(--accent)}
+.photo-card .pc-mono i{font-style:normal;color:var(--text)}
+.photo-card .pc-name{font-family:'Oswald',sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:.08em;font-size:1.05rem;color:var(--text)}
+.photo-card .pc-role{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.08em;color:var(--sec);text-transform:uppercase;border-top:1px solid var(--line);padding-top:14px;width:100%}
 
-/* pipeline */
-.pipeline{margin:52px 0 6px}
-.pipe{position:relative;height:44px}
+/* process strip */
+.process{position:relative;margin-top:56px;background:var(--container-low);border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden}
+.process .shader{position:absolute;inset:0;width:100%;height:100%;opacity:.5;pointer-events:none}
+.process::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,23,20,.35),rgba(0,23,20,.15));pointer-events:none}
+.process .wrap{position:relative;z-index:2;padding-top:34px;padding-bottom:34px}
+.pipe{position:relative;height:40px}
 .pipe .track,.pipe .flow{position:absolute;left:12.5%;right:12.5%;top:50%;height:2px;margin-top:-1px}
-.pipe .track{background:var(--line-strong)}
-.pipe .flow{background:var(--accent);transform:scaleX(0);transform-origin:left center;animation:draw 1.6s .3s ease forwards}
+.pipe .track{background:var(--variant)}
+.pipe .flow{background:var(--accent-deep);transform:scaleX(0);transform-origin:left center;animation:draw 1.6s .3s ease forwards}
 @keyframes draw{to{transform:scaleX(1)}}
-.pipe .node{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--ink);border:2px solid var(--accent);opacity:0;transform:scale(0);animation:pop .4s ease forwards}
+.pipe .node{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--accent);box-shadow:0 0 15px var(--glow);opacity:0;transform:scale(0);animation:pop .4s ease forwards}
 .pipe .n1{left:12.5%;animation-delay:.5s}.pipe .n2{left:37.5%;animation-delay:.85s}.pipe .n3{left:62.5%;animation-delay:1.2s}
-.pipe .n4{left:87.5%;animation-delay:1.55s;background:var(--accent);width:16px;height:16px;margin:-8px 0 0 -8px}
+.pipe .n4{left:87.5%;animation-delay:1.55s;width:20px;height:20px;margin:-10px 0 0 -10px;border:3px solid var(--surface);outline:2px solid var(--accent)}
 @keyframes pop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
-.stages{display:grid;grid-template-columns:repeat(4,1fr);margin-top:4px}
+.stages{display:grid;grid-template-columns:repeat(4,1fr);margin-top:6px}
 .stage{text-align:center}
-.stage .n{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted)}
-.stage .l{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;font-size:clamp(.85rem,2vw,1.25rem);letter-spacing:.03em;margin-top:2px}
+.stage .n{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--sec)}
+.stage .l{font-family:'Oswald',sans-serif;font-weight:500;text-transform:uppercase;font-size:clamp(.85rem,2vw,1.35rem);letter-spacing:.03em;margin-top:2px}
+.stage:last-child .n{color:var(--accent);font-weight:700}
 .stage:last-child .l{color:var(--accent)}
 
 /* sections */
-.sec{padding:clamp(52px,8vh,92px) 0;border-top:1px solid var(--line);scroll-margin-top:64px}
-.sec-head{display:flex;align-items:baseline;gap:1rem;margin-bottom:34px;flex-wrap:wrap}
-.sec-head h2{font-size:clamp(1.5rem,4vw,2.5rem);letter-spacing:.02em;line-height:1}
+.sec{padding:clamp(52px,8vh,92px) 0;scroll-margin-top:64px}
+.sec-head{margin-bottom:34px}
+.sec-head h2{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;font-size:clamp(1.6rem,4vw,2.5rem);letter-spacing:.01em;line-height:1.2;margin-top:8px}
 
-/* rows */
-.row{display:grid;grid-template-columns:44px 1fr;gap:20px;padding:24px 12px;margin:0 -12px;border-top:1px solid var(--line);align-items:start;border-radius:10px;transition:background .25s}
-.row:hover{background:rgba(242,237,227,.03)}
-.row:first-child{border-top:none}
-.row .idx{font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:.85rem;padding-top:5px;transition:transform .25s}
-.row:hover .idx{transform:translateX(4px)}
-.row h3{font-size:1.24rem;font-weight:700;margin-bottom:6px}
-.row p{color:var(--muted);max-width:60ch;font-weight:300}
+/* service cards */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{background:var(--raised);border:1px solid var(--line);padding:32px;transition:border-color .25s}
+.card:hover{border-color:var(--accent)}
+.card .idx{font-family:'Oswald',sans-serif;font-weight:700;font-size:2.25rem;line-height:1;color:rgba(177,204,198,.3);display:block;margin-bottom:16px;transition:color .25s}
+.card:hover .idx{color:rgba(255,193,108,.5)}
+.card h3{font-family:'Oswald',sans-serif;font-weight:500;text-transform:uppercase;font-size:1.3rem;letter-spacing:.02em;margin-bottom:8px}
+.card p{color:var(--text-soft);font-weight:400;max-width:60ch}
 
 /* flagship */
-.flag{background:linear-gradient(160deg,var(--ink-2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:clamp(26px,4vw,46px)}
-.flag-grid{display:grid;grid-template-columns:1fr clamp(190px,22vw,250px);gap:clamp(26px,4vw,52px);align-items:center}
-.ph-frame{border:1px solid var(--line-strong);border-radius:30px;padding:9px;background:var(--ink)}
-.ph-frame img{display:block;width:100%;height:auto;aspect-ratio:562/1232;object-fit:cover;border-radius:22px}
-.flag-phone{transform:rotate(2.5deg);transition:transform .35s ease}
-.flag:hover .flag-phone{transform:rotate(0deg)}
-.flag h3{font-size:clamp(1.7rem,5vw,2.9rem);line-height:.96;margin:12px 0 16px;letter-spacing:.02em}
-.flag p{font-weight:300;max-width:62ch;margin-bottom:20px}
-.chips{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:22px}
-.chip{font-family:'JetBrains Mono',monospace;font-size:.74rem;padding:6px 11px;border:1px solid var(--line-strong);border-radius:999px;color:var(--muted);transition:border-color .25s,color .25s}
-.chip:hover{border-color:var(--accent);color:var(--paper)}
-.status{display:inline-flex;align-items:center;gap:10px;font-size:.92rem;color:var(--accent-soft);margin-bottom:22px}
+.flag{background:var(--container-high);border:1px solid var(--line);padding:clamp(26px,4vw,56px);position:relative;overflow:hidden}
+.flag::before{content:"";position:absolute;top:-96px;right:-96px;width:384px;height:384px;border-radius:50%;background:rgba(255,193,108,.05);filter:blur(100px);pointer-events:none}
+.flag-grid{display:grid;grid-template-columns:1fr clamp(210px,24vw,300px);gap:clamp(26px,4vw,64px);align-items:center;position:relative;z-index:1}
+.flag h3{font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;font-size:clamp(2rem,6vw,4.2rem);line-height:.96;margin:12px 0 16px;letter-spacing:-.01em}
+.flag p{font-weight:400;color:var(--text-soft);max-width:62ch;margin-bottom:20px;font-size:1.05rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+.chip{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;padding:5px 12px;border:1px solid rgba(177,204,198,.3);background:rgba(177,204,198,.1);color:var(--sec);transition:border-color .25s,color .25s}
+.chip:hover{border-color:var(--accent);color:var(--text)}
+.status{display:inline-flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:.76rem;letter-spacing:.05em;text-transform:uppercase;font-weight:700;color:var(--accent);margin-bottom:22px}
 .status .pulse{width:9px;height:9px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(232,163,61,.5)}70%{box-shadow:0 0 0 12px rgba(232,163,61,0)}100%{box-shadow:0 0 0 0 rgba(232,163,61,0)}}
-.caselink{display:block;margin-top:4px;font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent);background:none;border:0;cursor:pointer;padding:0}
-.caselink:hover{color:var(--accent-soft)}
-.livelink{display:inline-block;margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--accent)}
-.livelink:hover{color:var(--accent-soft)}
+.flag-links{display:flex;flex-wrap:wrap;gap:12px 28px;margin-top:4px}
+.caselink{display:inline-flex;align-items:center;gap:8px;font-family:'Oswald',sans-serif;font-weight:500;text-transform:uppercase;font-size:1.1rem;letter-spacing:.03em;color:var(--accent);background:none;border:0;cursor:pointer;padding:0}
+.caselink .arr{transition:transform .25s}
+.caselink:hover .arr{transform:translateX(4px)}
+.caselink.ext{color:var(--text-soft)}
+.caselink.ext:hover{color:var(--text)}
+.caselink.ext:hover .arr{transform:translate(3px,-3px)}
 
-/* background grid */
-.bg-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line)}
-.cell{background:var(--ink);padding:24px;transition:background .25s}
-.cell:hover{background:var(--ink-2)}
-.cell .k{font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase}
-.cell .v{font-size:1.02rem;margin-top:8px;font-weight:300}
-.fit{margin-top:26px;color:var(--muted);font-size:.95rem;font-weight:300;max-width:72ch;font-style:italic}
-.fit b{color:var(--paper);font-style:normal;font-weight:600}
+/* phone mockup */
+.phone{position:relative;width:100%;max-width:300px;aspect-ratio:.46;background:var(--surface-deep);border:4px solid var(--container-highest);border-radius:40px;padding:12px;box-shadow:0 25px 50px -12px rgba(0,0,0,.5);overflow:hidden;margin:0 auto}
+.phone .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:96px;height:22px;background:var(--container-highest);border-radius:0 0 12px 12px;z-index:2}
+.phone img{display:block;width:100%;height:100%;object-fit:cover;border-radius:28px;transition:transform .7s}
+.flag:hover .phone img{transform:scale(1.04)}
+
+/* background section */
+.bg-grid{display:grid;grid-template-columns:5fr 7fr;gap:clamp(28px,5vw,72px);align-items:start}
+.bg-list .item{border-top:1px solid var(--line);padding:20px 0 4px}
+.bg-list .item:first-child{border-top:none;padding-top:8px}
+.bg-list .k{font-family:'JetBrains Mono',monospace;color:var(--sec);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase}
+.bg-list .v{font-size:1.08rem;margin-top:8px;font-weight:400;padding-bottom:16px}
+.fit-card{background:var(--raised);border:1px solid var(--line);padding:32px;position:relative;overflow:hidden}
+.fit-card::before{content:"";position:absolute;top:-32px;right:-32px;width:64px;height:64px;background:rgba(255,193,108,.1);transform:rotate(-45deg)}
+.fit-card h4{font-family:'Oswald',sans-serif;font-weight:500;text-transform:uppercase;font-size:1.25rem;letter-spacing:.02em;margin-bottom:8px;color:var(--accent)}
+.fit-card .no h4{color:var(--sec)}
+.fit-card p{font-size:1.05rem;font-weight:400}
+.fit-card .no{border-top:1px solid var(--line);margin-top:26px;padding-top:24px}
+.fit-card .no p{color:var(--text-soft);font-style:italic}
 
 /* contact */
-.contact h2{font-size:clamp(2rem,7vw,4.6rem);line-height:.94;margin-bottom:26px;white-space:pre-line}
-.cta{display:inline-block;background:var(--accent);color:var(--ink);font-weight:700;font-size:1.02rem;padding:15px 30px;border-radius:999px;transition:transform .18s,box-shadow .18s}
-.cta:hover{transform:translateY(-2px);box-shadow:0 10px 30px -10px rgba(232,163,61,.6)}
-.cta:active{transform:translateY(0) scale(.98)}
-.alt{margin-top:20px;color:var(--muted);font-size:.92rem}
-.alt a{color:var(--paper);border-bottom:1px solid var(--line-strong)}
-.alt a:hover{border-color:var(--accent)}
-.foot{border-top:1px solid var(--line);padding:32px 0;color:var(--muted);font-size:.82rem}
-.foot .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.contact{background:var(--container-low);border-top:1px solid var(--line);text-align:center}
+.contact .wrap{display:flex;flex-direction:column;align-items:center;gap:22px}
+.contact h2{font-size:clamp(2.2rem,7vw,4.8rem);line-height:.96;white-space:pre-line}
+.pf .cta{display:inline-block;background:var(--accent);color:var(--surface-deep);font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.02em;font-size:1.2rem;padding:16px 48px;box-shadow:0 0 40px rgba(255,193,108,.3);transition:transform .18s,background .18s}
+.cta:hover{transform:scale(1.04);background:#fff}
+.cta:active{transform:scale(.97)}
+.alt{color:var(--text-soft);font-size:.95rem;max-width:46ch}
+.alt a{color:var(--text);border-bottom:1px solid var(--line-strong)}
+.alt a:hover{color:var(--accent);border-color:var(--accent)}
+.foot{border-top:1px solid var(--line);padding:32px 0;color:var(--sec);font-size:.78rem}
+.foot .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;text-transform:uppercase;letter-spacing:.05em}
+.foot .mono{opacity:.6}
 
 /* case study page */
 .case{padding-top:40px}
-.backb{display:block;font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--muted);background:none;border:0;cursor:pointer;padding:0;margin-bottom:36px}
-.backb:hover{color:var(--paper)}
-.case h1{font-size:clamp(2.2rem,6vw,4rem);line-height:.96;margin:14px 0 12px;letter-spacing:.02em}
-.case .csub{color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:.9rem;margin-bottom:26px}
-.case .ov{font-size:clamp(1.05rem,2vw,1.3rem);font-weight:300;max-width:60ch;margin-bottom:40px}
+.backb{display:block;font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--sec);background:none;border:0;cursor:pointer;padding:0;margin-bottom:36px;text-transform:uppercase;letter-spacing:.05em}
+.backb:hover{color:var(--accent)}
+.case h1{font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;font-size:clamp(2.2rem,6vw,4rem);line-height:.96;margin:14px 0 12px}
+.case .csub{color:var(--sec);font-family:'JetBrains Mono',monospace;font-size:.88rem;margin-bottom:26px}
+.case .csub a{color:var(--accent)}
+.case .ov{font-size:clamp(1.05rem,2vw,1.25rem);font-weight:400;color:var(--text-soft);max-width:60ch;margin-bottom:40px}
 .shots{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 4px 14px;margin-bottom:40px;scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent}
 .shots::-webkit-scrollbar{height:8px}
-.shots::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:99px}
+.shots::-webkit-scrollbar-thumb{background:var(--line-strong)}
 .shots::-webkit-scrollbar-track{background:transparent}
-.shots:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:8px}
+.shots:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 .shot{flex:0 0 auto;width:min(230px,66vw);scroll-snap-align:start;margin:0}
-.shot .ph-frame{transition:transform .3s,border-color .3s}
-.shot:hover .ph-frame{transform:translateY(-4px);border-color:rgba(242,237,227,.45)}
-.shot-cap{margin-top:10px;font-size:.82rem;color:var(--muted)}
+.shot .sh-frame{border:1px solid var(--line);background:var(--surface-deep);padding:8px;border-radius:24px;transition:transform .3s,border-color .3s}
+.shot .sh-frame img{display:block;width:100%;height:auto;aspect-ratio:562/1232;object-fit:cover;border-radius:16px}
+.shot:hover .sh-frame{transform:translateY(-4px);border-color:var(--line-strong)}
+.shot-cap{margin-top:10px;font-size:.82rem;color:var(--sec)}
 .shot-cap .cn{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--accent);margin-right:7px}
-.cblocks{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);margin-bottom:36px}
-.cblock{background:var(--ink);padding:26px 24px}
-.cblock h4{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.03em;font-size:1.15rem;margin-bottom:8px}
-.cblock p{color:var(--muted);font-weight:300}
+.cblocks{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:36px}
+.cblock{background:var(--raised);border:1px solid var(--line);padding:28px 26px;transition:border-color .25s}
+.cblock:hover{border-color:var(--accent)}
+.cblock h4{font-family:'Oswald',sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:.03em;font-size:1.2rem;margin-bottom:8px}
+.cblock p{color:var(--text-soft);font-weight:400}
 .cmeta{display:grid;grid-template-columns:1fr 2fr;gap:28px;border-top:1px solid var(--line);padding-top:28px}
-.cmeta .mt{font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
-.cmeta p{font-weight:300;color:var(--paper)}
+.cmeta .mt{font-family:'JetBrains Mono',monospace;color:var(--sec);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
+.cmeta p{font-weight:400;color:var(--text)}
 
 .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s,transform .6s}
 .reveal.in{opacity:1;transform:none}
 
 @media(max-width:760px){
   .hero-grid{grid-template-columns:1fr;gap:26px}
-  .photo-img,.photo-card{max-width:260px}
-  .court{right:-220px;opacity:.6}
-  .bg-grid,.cblocks{grid-template-columns:1fr}
+  .photo-img,.photo-card{max-width:280px}
+  .cards,.bg-grid,.cblocks{grid-template-columns:1fr}
   .flag-grid{grid-template-columns:1fr}
-  .flag-phone{max-width:200px;margin:6px auto 0;transform:rotate(0)}
+  .phone{max-width:220px;margin-top:10px}
   .cmeta{grid-template-columns:1fr;gap:20px}
   .nav-r a.hide-sm{display:none}
 }
@@ -308,49 +339,128 @@ html{scroll-behavior:smooth}
 }
 `;
 
-/* ---------------- small components ---------------- */
-function Pipeline({ stages }) {
-  return (
-    <div className="pipeline" aria-hidden="true">
-      <div className="pipe">
-        <div className="track" />
-        <div className="flow" />
-        {[1, 2, 3, 4].map((n) => <span key={n} className={`node n${n}`} />)}
-      </div>
-      <div className="stages">
-        {stages.map((s, i) => (
-          <div className="stage" key={i}>
-            <div className="n">0{i + 1}</div>
-            <div className="l">{s}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+/* ---------------- kinetic shader (Obsidian Kinetic background) ---------------- */
+const FRAG = `precision highp float;
+varying vec2 v_texCoord;
+uniform float u_time;
+
+float random(vec2 st){return fract(sin(dot(st.xy,vec2(12.9898,78.233)))*43758.5453123);}
+float noise(vec2 st){
+  vec2 i=floor(st); vec2 f=fract(st);
+  float a=random(i); float b=random(i+vec2(1.0,0.0));
+  float c=random(i+vec2(0.0,1.0)); float d=random(i+vec2(1.0,1.0));
+  vec2 u=f*f*(3.0-2.0*f);
+  return mix(a,b,u.x)+(c-a)*u.y*(1.0-u.x)+(d-b)*u.x*u.y;
+}
+void main(){
+  vec2 st=v_texCoord;
+  float n1=noise(st*3.0+u_time*0.2);
+  float n2=noise(st*6.0-u_time*0.4+n1);
+  vec3 color1=vec3(0.0,0.09,0.08);
+  vec3 color2=vec3(0.14,0.24,0.23);
+  vec3 accent=vec3(0.91,0.64,0.24);
+  float mixFactor=smoothstep(0.3,0.7,n2);
+  vec3 finalColor=mix(color1,color2,mixFactor);
+  float glint=pow(smoothstep(0.45,0.5,n2),10.0);
+  finalColor=mix(finalColor,accent,glint*0.15);
+  gl_FragColor=vec4(finalColor,1.0);
+}`;
+
+const VERT = `attribute vec2 a_position;
+varying vec2 v_texCoord;
+void main(){
+  v_texCoord=a_position*0.5+0.5;
+  gl_Position=vec4(a_position,0.0,1.0);
+}`;
+
+function KineticShader() {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const canvas = ref.current;
+    if (!canvas) return;
+    const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+    if (!gl) return;
+
+    const syncSize = () => {
+      const w = canvas.clientWidth || 1280;
+      const h = canvas.clientHeight || 240;
+      if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+    };
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(syncSize) : null;
+    ro?.observe(canvas);
+    syncSize();
+
+    const cs = (type, src) => {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      return s;
+    };
+    const prog = gl.createProgram();
+    gl.attachShader(prog, cs(gl.VERTEX_SHADER, VERT));
+    gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, FRAG));
+    gl.linkProgram(prog);
+    gl.useProgram(prog);
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    const pos = gl.getAttribLocation(prog, "a_position");
+    gl.enableVertexAttribArray(pos);
+    gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+    const uTime = gl.getUniformLocation(prog, "u_time");
+
+    let raf;
+    const render = (t) => {
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      if (uTime) gl.uniform1f(uTime, t * 0.001);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      raf = requestAnimationFrame(render);
+    };
+    raf = requestAnimationFrame(render);
+
+    /* no loseContext() here: React StrictMode re-runs the effect on the same
+       canvas, and a lost context can't be re-acquired via getContext() */
+    return () => {
+      cancelAnimationFrame(raf);
+      ro?.disconnect();
+    };
+  }, []);
+  return <canvas ref={ref} className="shader" aria-hidden="true" />;
 }
 
-function Court() {
+/* ---------------- small components ---------------- */
+function Process({ stages }) {
   return (
-    <svg className="court" viewBox="0 0 400 780" aria-hidden="true" focusable="false">
-      <g fill="none" stroke="rgba(242,237,227,.055)" strokeWidth="2">
-        <rect x="20" y="20" width="360" height="740" rx="4" />
-        <line x1="20" y1="250" x2="380" y2="250" />
-        <line x1="20" y1="390" x2="380" y2="390" />
-        <line x1="20" y1="530" x2="380" y2="530" />
-        <line x1="200" y1="250" x2="200" y2="530" />
-      </g>
-      <circle cx="128" cy="322" r="7" fill="rgba(232,163,61,.16)" />
-    </svg>
+    <div className="process" aria-hidden="true">
+      <KineticShader />
+      <div className="wrap">
+        <div className="pipe">
+          <div className="track" />
+          <div className="flow" />
+          {[1, 2, 3, 4].map((n) => <span key={n} className={`node n${n}`} />)}
+        </div>
+        <div className="stages">
+          {stages.map((s, i) => (
+            <div className="stage" key={i}>
+              <div className="n">0{i + 1}</div>
+              <div className="l">{s}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
 function Photo({ t }) {
   const [hasPhoto, setHasPhoto] = useState(true);
   if (hasPhoto) {
-    return <img className="photo-img" src="/photo.jpg" alt="Valeriy Bykov" width="480" height="600" decoding="async" onError={() => setHasPhoto(false)} />;
+    return <img className="photo-img" src="/photo.jpg" alt="Valeriy Bykov" width="480" height="640" decoding="async" onError={() => setHasPhoto(false)} />;
   }
   return (
     <div className="photo-card" aria-hidden="true">
+      <span className="tick tl" /><span className="tick br" />
       <div className="pc-mono">VB<i>.</i></div>
       <div className="pc-name">Valeriy Bykov</div>
       <div className="pc-role">{t.photoRole}</div>
@@ -375,7 +485,6 @@ function Home({ t, go }) {
   return (
     <>
       <header className="hero">
-        <Court />
         <div className="wrap">
           <div className="hero-grid">
             <div>
@@ -385,19 +494,21 @@ function Home({ t, go }) {
             </div>
             <Photo t={t} />
           </div>
-          <Pipeline stages={t.stages} />
         </div>
+        <Process stages={t.stages} />
       </header>
 
       <section className="sec" id="work">
         <div className="wrap">
-          <div className="sec-head reveal"><span className="eyebrow">{t.workEyebrow}</span><h2 className="disp">{t.workTitle}</h2></div>
-          {t.services.map(([h, p], i) => (
-            <div className="row reveal" key={i}>
-              <div className="idx">0{i + 1}</div>
-              <div><h3>{h}</h3><p>{p}</p></div>
-            </div>
-          ))}
+          <div className="sec-head reveal"><span className="eyebrow">{t.workEyebrow}</span><h2>{t.workTitle}</h2></div>
+          <div className="cards">
+            {t.services.map(([h, p], i) => (
+              <div className="card reveal" key={i}>
+                <span className="idx">0{i + 1}</span>
+                <h3>{h}</h3><p>{p}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -407,17 +518,18 @@ function Home({ t, go }) {
             <div className="flag-grid">
               <div>
                 <span className="eyebrow">{t.flagEyebrow}</span>
-                <h3 className="disp">{t.flagTitle}</h3>
+                <h3>{t.flagTitle}</h3>
                 <p>{t.flagDesc}</p>
                 <div className="chips">{STACK.map((s) => <span className="chip" key={s}>{s}</span>)}</div>
                 <div className="status"><span className="pulse" />{t.flagStatus}</div>
-                <button className="caselink" onClick={() => go("padel")}>{t.caseLink}</button>
-                <a className="caselink livelink" href="https://padelpack.app" target="_blank" rel="noopener noreferrer">padelpack.app ↗</a>
-              </div>
-              <div className="flag-phone" aria-hidden="true">
-                <div className="ph-frame">
-                  <img src="/shot2.jpg" alt="" width="562" height="1232" loading="lazy" decoding="async" />
+                <div className="flag-links">
+                  <button className="caselink" onClick={() => go("padel")}>{t.caseLink}<span className="arr" aria-hidden="true">→</span></button>
+                  <a className="caselink ext" href="https://padelpack.app" target="_blank" rel="noopener noreferrer">padelpack.app<span className="arr" aria-hidden="true">↗</span></a>
                 </div>
+              </div>
+              <div className="phone" aria-hidden="true">
+                <div className="notch" />
+                <img src="/shot2.jpg" alt="" width="562" height="1232" loading="lazy" decoding="async" />
               </div>
             </div>
           </div>
@@ -426,13 +538,25 @@ function Home({ t, go }) {
 
       <section className="sec" id="bg">
         <div className="wrap">
-          <div className="sec-head reveal"><span className="eyebrow">{t.bgEyebrow}</span><h2 className="disp">{t.bgTitle}</h2></div>
-          <div className="bg-grid reveal">
-            {t.bgCells.map(([k, v], i) => (
-              <div className="cell" key={i}><div className="k">{k}</div><div className="v">{v}</div></div>
-            ))}
+          <div className="bg-grid">
+            <div className="bg-list reveal">
+              <span className="eyebrow">{t.bgEyebrow}</span>
+              <h2 className="disp" style={{ fontSize: "clamp(1.6rem,4vw,2.5rem)", fontWeight: 600, margin: "8px 0 22px", lineHeight: 1.2 }}>{t.bgTitle}</h2>
+              {t.bgCells.map(([k, v], i) => (
+                <div className="item" key={i}><div className="k">{k}</div><div className="v">{v}</div></div>
+              ))}
+            </div>
+            <div className="fit-card reveal">
+              <div>
+                <h4>{t.fitBest}</h4>
+                <p>{t.fitBestText}</p>
+              </div>
+              <div className="no">
+                <h4>{t.fitNo}</h4>
+                <p>{t.fitNoText}</p>
+              </div>
+            </div>
           </div>
-          <p className="fit reveal"><b>{t.fitBest}</b>{t.fitBestText}<b>{t.fitNo}</b>{t.fitNoText}</p>
         </div>
       </section>
 
@@ -460,14 +584,14 @@ function Padel({ t, go }) {
       <div className="wrap">
         <button className="backb" onClick={() => go("home")}>{t.caseBack}</button>
         <span className="eyebrow">{t.caseEyebrow}</span>
-        <h1 className="disp">{t.flagTitle}</h1>
-        <div className="csub">{t.caseSubtitle} · <a className="livelink" href="https://padelpack.app" target="_blank" rel="noopener">padelpack.app ↗</a></div>
+        <h1>{t.flagTitle}</h1>
+        <div className="csub">{t.caseSubtitle} · <a href="https://padelpack.app" target="_blank" rel="noopener">padelpack.app ↗</a></div>
         <p className="ov">{t.caseOverview}</p>
 
         <div className="shots reveal" tabIndex="0" role="region" aria-label={t.caseShotsLabel}>
           {SHOTS.map((src, i) => (
             <figure className="shot" key={src}>
-              <div className="ph-frame">
+              <div className="sh-frame">
                 <img src={src} alt={`PadelPack — ${t.caseShots[i]}`} width="562" height="1232" loading="lazy" decoding="async" />
               </div>
               <figcaption className="shot-cap"><span className="cn">0{i + 1}</span>{t.caseShots[i]}</figcaption>
@@ -519,7 +643,7 @@ export default function App() {
     if (!document.getElementById(id)) {
       const l = document.createElement("link");
       l.id = id; l.rel = "stylesheet";
-      l.href = "https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap";
+      l.href = "https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap";
       document.head.appendChild(l);
     }
   }, []);
