@@ -462,4 +462,6 @@ export default function App() {
           <span className="mono">{t.footerBuilt}</span>
         </div>
       </footer>
-    </di
+    </div>
+  );
+}
