@@ -265,7 +265,7 @@ html{scroll-behavior:smooth}
 
 /* case study page */
 .case{padding-top:40px}
-.backb{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--muted);background:none;border:0;cursor:pointer;padding:0;margin-bottom:36px}
+.backb{display:block;font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--muted);background:none;border:0;cursor:pointer;padding:0;margin-bottom:36px}
 .backb:hover{color:var(--paper)}
 .case h1{font-size:clamp(2.2rem,6vw,4rem);line-height:.96;margin:14px 0 12px;letter-spacing:.02em}
 .case .csub{color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:.9rem;margin-bottom:26px}
