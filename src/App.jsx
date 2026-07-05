@@ -39,7 +39,7 @@ const T = {
     fitNoText: " large performance- or security-critical engineering that needs a senior software engineer — and I'll tell you so up front rather than waste your budget.",
     contactEyebrow: "Let's talk",
     contactTitle: "Have something\nto ship?",
-    contactAlt1: "Or find me on ",
+    contactAlt1: "Or message me on ",
     contactAlt2: ". Based remote · working across RU & international.",
     footerBuilt: "Built solo — of course.",
     /* case study */
@@ -47,8 +47,15 @@ const T = {
     caseEyebrow: "Case study · solo product",
     caseSubtitle: "Concept to app stores, one person",
     caseOverview: "A padel community needed a way to run recurring leagues without spreadsheets and group-chat chaos. I built the whole product solo — from the data model to the mobile builds now in store review.",
-    caseShotLabel: "Screenshot",
-    caseShotHint: "replace in public/",
+    caseShotsLabel: "App screenshots — scroll horizontally",
+    caseShots: [
+      "League board & members",
+      "Tournament rounds, live score",
+      "Score entry",
+      "League analytics",
+      "Player profile & form",
+      "Tournament finale",
+    ],
     caseBlocks: [
       ["The problem", "Manual scheduling, results scattered across chats, and no single source of truth for standings. It didn't scale past a handful of players."],
       ["What I built", "A full product: automated round-robin scheduling, live standings and ratings, player profiles and history, and guest-invite flows — on web first, then packaged for mobile."],
@@ -96,7 +103,7 @@ const T = {
     fitNoText: " нагруженная или security-critical инженерия, которой нужен сильный software-инженер — скажу об этом сразу, а не потрачу бюджет впустую.",
     contactEyebrow: "Давай обсудим",
     contactTitle: "Есть что\nзапустить?",
-    contactAlt1: "Или найди меня на ",
+    contactAlt1: "Или напиши в ",
     contactAlt2: ". Работаю удалённо — по РФ и международно.",
     footerBuilt: "Сделано в одиночку — а как же.",
     /* case study */
@@ -104,8 +111,15 @@ const T = {
     caseEyebrow: "Кейс · сольный продукт",
     caseSubtitle: "От идеи до сторов, один человек",
     caseOverview: "Сообществу падела нужен был способ вести регулярные лиги без таблиц и хаоса в чатах. Я собрал весь продукт один — от модели данных до мобильных сборок, которые сейчас на ревью в сторах.",
-    caseShotLabel: "Скриншот",
-    caseShotHint: "заменить в public/",
+    caseShotsLabel: "Скриншоты приложения — прокрутка по горизонтали",
+    caseShots: [
+      "Доска лиги и участники",
+      "Раунды турнира, живой счёт",
+      "Ввод результата",
+      "Аналитика лиги",
+      "Профиль игрока и форма",
+      "Финал турнира",
+    ],
     caseBlocks: [
       ["Проблема", "Расписание вручную, результаты разбросаны по чатам, нет единого источника правды по рейтингам. Дальше горстки игроков это не масштабировалось."],
       ["Что сделал", "Полноценный продукт: автоматическое расписание по круговой системе, живые рейтинги, профили и история игроков, гостевые инвайты — сначала на вебе, затем упаковано под мобильные."],
@@ -120,10 +134,11 @@ const T = {
 
 const STACK = ["Vite", "React", "Supabase", "Postgres · RLS", "Edge Functions", "Storage", "Capacitor"];
 
-/* fill in when the profile is live; empty string hides the line */
+const TELEGRAM_URL = "https://t.me/valerbykov";
+/* fill in when the profile is live; empty string hides the link */
 const UPWORK_URL = "";
 
-const SHOTS = [1, 2, 3, 4, 5, 6, 7].map((n) => `/shot${n}.jpg`);
+const SHOTS = [1, 2, 3, 4, 5, 7].map((n) => `/shot${n}.jpg`);
 
 /* ---------------- styles ---------------- */
 const css = `
@@ -162,7 +177,9 @@ html{scroll-behavior:smooth}
 .toggle button.on{background:var(--accent);color:var(--ink);font-weight:700}
 
 /* hero */
-.hero{padding:clamp(56px,10vh,120px) 0 32px}
+.hero{padding:clamp(56px,10vh,120px) 0 32px;position:relative;overflow:hidden}
+.court{position:absolute;top:-6%;right:-140px;height:115%;pointer-events:none;user-select:none}
+.hero .wrap{position:relative}
 .hero-grid{display:grid;grid-template-columns:1.4fr .9fr;gap:40px;align-items:center}
 .hero h1{font-size:clamp(2.6rem,7vw,5.4rem);line-height:.94;letter-spacing:.01em;margin:20px 0 24px;max-width:16ch}
 .hero .sub{font-size:clamp(1.02rem,2vw,1.28rem);max-width:44ch;font-weight:300;color:var(--paper)}
@@ -208,6 +225,11 @@ html{scroll-behavior:smooth}
 
 /* flagship */
 .flag{background:linear-gradient(160deg,var(--ink-2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:clamp(26px,4vw,46px)}
+.flag-grid{display:grid;grid-template-columns:1fr clamp(190px,22vw,250px);gap:clamp(26px,4vw,52px);align-items:center}
+.ph-frame{border:1px solid var(--line-strong);border-radius:30px;padding:9px;background:var(--ink)}
+.ph-frame img{display:block;width:100%;height:auto;aspect-ratio:562/1232;object-fit:cover;border-radius:22px}
+.flag-phone{transform:rotate(2.5deg);transition:transform .35s ease}
+.flag:hover .flag-phone{transform:rotate(0deg)}
 .flag h3{font-size:clamp(1.7rem,5vw,2.9rem);line-height:.96;margin:12px 0 16px;letter-spacing:.02em}
 .flag p{font-weight:300;max-width:62ch;margin-bottom:20px}
 .chips{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:22px}
@@ -248,9 +270,16 @@ html{scroll-behavior:smooth}
 .case h1{font-size:clamp(2.2rem,6vw,4rem);line-height:.96;margin:14px 0 12px;letter-spacing:.02em}
 .case .csub{color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:.9rem;margin-bottom:26px}
 .case .ov{font-size:clamp(1.05rem,2vw,1.3rem);font-weight:300;max-width:60ch;margin-bottom:40px}
-.shots{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:48px}
-.shot-img{display:block;width:100%;height:auto;aspect-ratio:562/1232;object-fit:cover;border-radius:20px;border:1px solid var(--line);background:var(--ink-2);transition:transform .3s,border-color .3s}
-.shot-img:hover{transform:translateY(-4px);border-color:var(--line-strong)}
+.shots{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 4px 14px;margin-bottom:40px;scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent}
+.shots::-webkit-scrollbar{height:8px}
+.shots::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:99px}
+.shots::-webkit-scrollbar-track{background:transparent}
+.shots:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:8px}
+.shot{flex:0 0 auto;width:min(230px,66vw);scroll-snap-align:start;margin:0}
+.shot .ph-frame{transition:transform .3s,border-color .3s}
+.shot:hover .ph-frame{transform:translateY(-4px);border-color:rgba(242,237,227,.45)}
+.shot-cap{margin-top:10px;font-size:.82rem;color:var(--muted)}
+.shot-cap .cn{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--accent);margin-right:7px}
 .cblocks{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);margin-bottom:36px}
 .cblock{background:var(--ink);padding:26px 24px}
 .cblock h4{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.03em;font-size:1.15rem;margin-bottom:8px}
@@ -264,13 +293,14 @@ html{scroll-behavior:smooth}
 
 @media(max-width:760px){
   .hero-grid{grid-template-columns:1fr;gap:26px}
-  .photo{max-width:260px}
+  .photo-img,.photo-card{max-width:260px}
+  .court{right:-220px;opacity:.6}
   .bg-grid,.cblocks{grid-template-columns:1fr}
-  .shots{grid-template-columns:1fr 1fr}
+  .flag-grid{grid-template-columns:1fr}
+  .flag-phone{max-width:200px;margin:6px auto 0;transform:rotate(0)}
   .cmeta{grid-template-columns:1fr;gap:20px}
   .nav-r a.hide-sm{display:none}
 }
-@media(max-width:440px){.shots{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .pf *{animation:none!important;transition:none!important}
@@ -296,6 +326,21 @@ function Pipeline({ stages }) {
         ))}
       </div>
     </div>
+  );
+}
+
+function Court() {
+  return (
+    <svg className="court" viewBox="0 0 400 780" aria-hidden="true" focusable="false">
+      <g fill="none" stroke="rgba(242,237,227,.055)" strokeWidth="2">
+        <rect x="20" y="20" width="360" height="740" rx="4" />
+        <line x1="20" y1="250" x2="380" y2="250" />
+        <line x1="20" y1="390" x2="380" y2="390" />
+        <line x1="20" y1="530" x2="380" y2="530" />
+        <line x1="200" y1="250" x2="200" y2="530" />
+      </g>
+      <circle cx="128" cy="322" r="7" fill="rgba(232,163,61,.16)" />
+    </svg>
   );
 }
 
@@ -330,6 +375,7 @@ function Home({ t, go }) {
   return (
     <>
       <header className="hero">
+        <Court />
         <div className="wrap">
           <div className="hero-grid">
             <div>
@@ -358,13 +404,22 @@ function Home({ t, go }) {
       <section className="sec" id="project">
         <div className="wrap">
           <div className="flag reveal">
-            <span className="eyebrow">{t.flagEyebrow}</span>
-            <h3 className="disp">{t.flagTitle}</h3>
-            <p>{t.flagDesc}</p>
-            <div className="chips">{STACK.map((s) => <span className="chip" key={s}>{s}</span>)}</div>
-            <div className="status"><span className="pulse" />{t.flagStatus}</div>
-            <button className="caselink" onClick={() => go("padel")}>{t.caseLink}</button>
-            <a className="caselink livelink" href="https://padelpack.app" target="_blank" rel="noopener">padelpack.app ↗</a>
+            <div className="flag-grid">
+              <div>
+                <span className="eyebrow">{t.flagEyebrow}</span>
+                <h3 className="disp">{t.flagTitle}</h3>
+                <p>{t.flagDesc}</p>
+                <div className="chips">{STACK.map((s) => <span className="chip" key={s}>{s}</span>)}</div>
+                <div className="status"><span className="pulse" />{t.flagStatus}</div>
+                <button className="caselink" onClick={() => go("padel")}>{t.caseLink}</button>
+                <a className="caselink livelink" href="https://padelpack.app" target="_blank" rel="noopener noreferrer">padelpack.app ↗</a>
+              </div>
+              <div className="flag-phone" aria-hidden="true">
+                <div className="ph-frame">
+                  <img src="/shot2.jpg" alt="" width="562" height="1232" loading="lazy" decoding="async" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -386,7 +441,11 @@ function Home({ t, go }) {
           <span className="eyebrow reveal">{t.contactEyebrow}</span>
           <h2 className="disp reveal">{t.contactTitle}</h2>
           <a className="cta reveal" href="mailto:hi@valerbykov.com">hi@valerbykov.com</a>
-          {UPWORK_URL && <p className="alt reveal">{t.contactAlt1}<a href={UPWORK_URL} target="_blank" rel="noopener noreferrer">Upwork</a>{t.contactAlt2}</p>}
+          <p className="alt reveal">
+            {t.contactAlt1}<a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer">Telegram</a>
+            {UPWORK_URL && <> · <a href={UPWORK_URL} target="_blank" rel="noopener noreferrer">Upwork</a></>}
+            {t.contactAlt2}
+          </p>
         </div>
       </section>
     </>
@@ -405,9 +464,14 @@ function Padel({ t, go }) {
         <div className="csub">{t.caseSubtitle} · <a className="livelink" href="https://padelpack.app" target="_blank" rel="noopener">padelpack.app ↗</a></div>
         <p className="ov">{t.caseOverview}</p>
 
-        <div className="shots reveal">
+        <div className="shots reveal" tabIndex="0" role="region" aria-label={t.caseShotsLabel}>
           {SHOTS.map((src, i) => (
-            <img className="shot-img" key={src} src={src} alt={`PadelPack — ${t.caseShotLabel} ${i + 1}`} width="562" height="1232" loading="lazy" decoding="async" />
+            <figure className="shot" key={src}>
+              <div className="ph-frame">
+                <img src={src} alt={`PadelPack — ${t.caseShots[i]}`} width="562" height="1232" loading="lazy" decoding="async" />
+              </div>
+              <figcaption className="shot-cap"><span className="cn">0{i + 1}</span>{t.caseShots[i]}</figcaption>
+            </figure>
           ))}
         </div>
 
