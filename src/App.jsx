@@ -122,6 +122,8 @@ const T = {
 
 const STACK = ["Vite", "React", "Supabase", "Postgres · RLS", "Edge Functions", "Storage", "Capacitor"];
 
+const SHOTS = [1, 2, 3, 4, 5, 6, 7].map((n) => `/shot${n}.jpg`);
+
 /* ---------------- styles ---------------- */
 const css = `
 :root{
@@ -228,9 +230,7 @@ const css = `
 .case .csub{color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:.9rem;margin-bottom:26px}
 .case .ov{font-size:clamp(1.05rem,2vw,1.3rem);font-weight:300;max-width:60ch;margin-bottom:40px}
 .shots{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:48px}
-.shot{aspect-ratio:9/19;border:1.5px dashed var(--line-strong);border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--muted);background:linear-gradient(160deg,var(--ink-2),var(--panel));text-align:center;padding:14px}
-.shot .sl{font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:.9rem;color:var(--paper);letter-spacing:.05em}
-.shot .sh{font-family:'JetBrains Mono',monospace;font-size:.66rem}
+.shot-img{display:block;width:100%;height:auto;border-radius:20px;border:1px solid var(--line);background:var(--ink-2)}
 .cblocks{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);margin-bottom:36px}
 .cblock{background:var(--ink);padding:26px 24px}
 .cblock h4{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.03em;font-size:1.15rem;margin-bottom:8px}
@@ -377,11 +377,8 @@ function Padel({ t, go }) {
         <p className="ov">{t.caseOverview}</p>
 
         <div className="shots reveal">
-          {[1, 2, 3].map((n) => (
-            <div className="shot" key={n}>
-              <div className="sl">{t.caseShotLabel} {n}</div>
-              <div className="sh">{t.caseShotHint}</div>
-            </div>
+          {SHOTS.map((src, i) => (
+            <img className="shot-img" key={src} src={src} alt={`${t.caseShotLabel} ${i + 1}`} loading="lazy" />
           ))}
         </div>
 
