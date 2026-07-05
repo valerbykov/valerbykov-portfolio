@@ -277,7 +277,13 @@ html{scroll-behavior:smooth}
 .bg-list .item:first-child{border-top:none;padding-top:8px}
 .bg-list .k{font-family:'JetBrains Mono',monospace;color:var(--sec);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase}
 .bg-list .v{font-size:1.08rem;margin-top:8px;font-weight:400;padding-bottom:16px}
-.fit-card{background:var(--raised);border:1px solid var(--line);padding:32px;position:relative;overflow:hidden}
+.bg-right{display:flex;gap:12px;align-items:stretch;flex-wrap:wrap}
+.portrait{flex:0 0 clamp(180px,17vw,230px);margin:0;background:#eef2ee;border:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden}
+.portrait img{display:block;width:100%;flex:1;aspect-ratio:5/6;object-fit:cover;object-position:top}
+.portrait figcaption{background:var(--surface-deep);border-top:1px solid var(--line);padding:10px 14px;display:flex;flex-direction:column;gap:2px}
+.portrait .pn{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;font-size:.95rem;letter-spacing:.04em;color:var(--text)}
+.portrait .pc{font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.14em;color:var(--accent);text-transform:uppercase}
+.fit-card{flex:1 1 260px;background:var(--raised);border:1px solid var(--line);padding:32px;position:relative;overflow:hidden}
 .fit-card::before{content:"";position:absolute;top:-32px;right:-32px;width:64px;height:64px;background:rgba(255,193,108,.1);transform:rotate(-45deg)}
 .fit-card h4{font-family:'Oswald',sans-serif;font-weight:500;text-transform:uppercase;font-size:1.25rem;letter-spacing:.02em;margin-bottom:8px;color:var(--accent)}
 .fit-card .no h4{color:var(--sec)}
@@ -339,6 +345,7 @@ html{scroll-behavior:smooth}
   .photo-img,.photo-card{max-width:280px}
   .phone3d{height:380px;max-width:300px;margin:0 auto}
   .cards,.bg-grid,.cblocks{grid-template-columns:1fr}
+  .portrait{flex-basis:230px;margin:0 auto}
   .flag-grid{grid-template-columns:1fr}
   .phone{max-width:220px;margin-top:10px}
   .cmeta{grid-template-columns:1fr;gap:20px}
@@ -460,6 +467,20 @@ function Process({ stages }) {
         </div>
       </div>
     </div>
+  );
+}
+
+function Portrait() {
+  const [ok, setOk] = useState(true);
+  if (!ok) return null;
+  return (
+    <figure className="portrait">
+      <img src="/photo.jpg" alt="Valeriy Bykov" width="418" height="501" loading="lazy" decoding="async" onError={() => setOk(false)} />
+      <figcaption>
+        <span className="pn">Valeriy Bykov</span>
+        <span className="pc">PMP · PMI-ACP</span>
+      </figcaption>
+    </figure>
   );
 }
 
@@ -588,14 +609,17 @@ function Home({ t, go }) {
                 <div className="item" key={i}><div className="k">{k}</div><div className="v">{v}</div></div>
               ))}
             </div>
-            <div className="fit-card reveal kin">
-              <div>
-                <h4>{t.fitBest}</h4>
-                <p>{t.fitBestText}</p>
-              </div>
-              <div className="no">
-                <h4>{t.fitNo}</h4>
-                <p>{t.fitNoText}</p>
+            <div className="bg-right reveal">
+              <Portrait />
+              <div className="fit-card kin">
+                <div>
+                  <h4>{t.fitBest}</h4>
+                  <p>{t.fitBestText}</p>
+                </div>
+                <div className="no">
+                  <h4>{t.fitNo}</h4>
+                  <p>{t.fitNoText}</p>
+                </div>
               </div>
             </div>
           </div>
