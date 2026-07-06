@@ -277,13 +277,7 @@ html{scroll-behavior:smooth}
 .bg-list .item:first-child{border-top:none;padding-top:8px}
 .bg-list .k{font-family:'JetBrains Mono',monospace;color:var(--sec);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase}
 .bg-list .v{font-size:1.08rem;margin-top:8px;font-weight:400;padding-bottom:16px}
-.bg-right{display:flex;gap:12px;align-items:stretch;flex-wrap:wrap}
-.portrait{flex:0 0 clamp(180px,17vw,230px);margin:0;background:#eef2ee;border:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden}
-.portrait img{display:block;width:100%;flex:1;aspect-ratio:5/6;object-fit:cover;object-position:top}
-.portrait figcaption{background:var(--surface-deep);border-top:1px solid var(--line);padding:10px 14px;display:flex;flex-direction:column;gap:2px}
-.portrait .pn{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;font-size:.95rem;letter-spacing:.04em;color:var(--text)}
-.portrait .pc{font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.14em;color:var(--accent);text-transform:uppercase}
-.fit-card{flex:1 1 260px;background:var(--raised);border:1px solid var(--line);padding:32px;position:relative;overflow:hidden}
+.fit-card{background:var(--raised);border:1px solid var(--line);padding:32px;position:relative;overflow:hidden}
 .fit-card::before{content:"";position:absolute;top:-32px;right:-32px;width:64px;height:64px;background:rgba(255,193,108,.1);transform:rotate(-45deg)}
 .fit-card h4{font-family:'Oswald',sans-serif;font-weight:500;text-transform:uppercase;font-size:1.25rem;letter-spacing:.02em;margin-bottom:8px;color:var(--accent)}
 .fit-card .no h4{color:var(--sec)}
@@ -293,6 +287,9 @@ html{scroll-behavior:smooth}
 
 /* contact */
 .contact{background:var(--container-low);border-top:1px solid var(--line);text-align:center}
+.portrait{margin:0;position:relative;width:clamp(160px,22vw,210px)}
+.portrait::before{content:"";position:absolute;inset:-18% -32% -6%;background:radial-gradient(ellipse at 50% 42%,rgba(232,163,61,.16),rgba(177,204,198,.05) 55%,transparent 72%);pointer-events:none}
+.portrait img{display:block;width:100%;height:auto;position:relative;filter:saturate(.9);-webkit-mask-image:linear-gradient(to bottom,#000 78%,transparent 100%);mask-image:linear-gradient(to bottom,#000 78%,transparent 100%)}
 .contact .wrap{display:flex;flex-direction:column;align-items:center;gap:22px}
 .contact h2{font-size:clamp(2.2rem,7vw,4.8rem);line-height:.96;white-space:pre-line}
 .pf .cta{display:inline-block;background:var(--accent);color:var(--surface-deep);font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.02em;font-size:1.2rem;padding:16px 48px;box-shadow:0 0 40px rgba(255,193,108,.3);transition:transform .18s,background .18s}
@@ -345,7 +342,6 @@ html{scroll-behavior:smooth}
   .photo-img,.photo-card{max-width:280px}
   .phone3d{height:380px;max-width:300px;margin:0 auto}
   .cards,.bg-grid,.cblocks{grid-template-columns:1fr}
-  .portrait{flex-basis:230px;margin:0 auto}
   .flag-grid{grid-template-columns:1fr}
   .phone{max-width:220px;margin-top:10px}
   .cmeta{grid-template-columns:1fr;gap:20px}
@@ -474,20 +470,16 @@ function Portrait() {
   const [ok, setOk] = useState(true);
   if (!ok) return null;
   return (
-    <figure className="portrait">
-      <img src="/photo.jpg" alt="Valeriy Bykov" width="418" height="501" loading="lazy" decoding="async" onError={() => setOk(false)} />
-      <figcaption>
-        <span className="pn">Valeriy Bykov</span>
-        <span className="pc">PMP · PMI-ACP</span>
-      </figcaption>
-    </figure>
+    <div className="portrait">
+      <img src="/photo.png" alt="Valeriy Bykov" width="406" height="472" loading="lazy" decoding="async" onError={() => setOk(false)} />
+    </div>
   );
 }
 
 function Photo({ t }) {
   const [hasPhoto, setHasPhoto] = useState(true);
   if (hasPhoto) {
-    return <img className="photo-img" src="/photo.jpg" alt="Valeriy Bykov" width="480" height="640" decoding="async" onError={() => setHasPhoto(false)} />;
+    return <img className="photo-img" src="/photo.png" alt="Valeriy Bykov" width="406" height="472" decoding="async" onError={() => setHasPhoto(false)} />;
   }
   return (
     <div className="photo-card" aria-hidden="true">
@@ -609,17 +601,14 @@ function Home({ t, go }) {
                 <div className="item" key={i}><div className="k">{k}</div><div className="v">{v}</div></div>
               ))}
             </div>
-            <div className="bg-right reveal">
-              <Portrait />
-              <div className="fit-card kin">
-                <div>
-                  <h4>{t.fitBest}</h4>
-                  <p>{t.fitBestText}</p>
-                </div>
-                <div className="no">
-                  <h4>{t.fitNo}</h4>
-                  <p>{t.fitNoText}</p>
-                </div>
+            <div className="fit-card reveal kin">
+              <div>
+                <h4>{t.fitBest}</h4>
+                <p>{t.fitBestText}</p>
+              </div>
+              <div className="no">
+                <h4>{t.fitNo}</h4>
+                <p>{t.fitNoText}</p>
               </div>
             </div>
           </div>
@@ -629,6 +618,7 @@ function Home({ t, go }) {
       <section className="sec contact" id="contact">
         <div className="wrap">
           <Rv className="eyebrow">{t.contactEyebrow}</Rv>
+          <Portrait />
           <h2 className="disp"><Rv>{t.contactTitle}</Rv></h2>
           <a className="cta reveal" href="mailto:hi@valerbykov.com">hi@valerbykov.com</a>
           <p className="alt reveal">
