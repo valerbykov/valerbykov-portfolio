@@ -215,21 +215,20 @@ html{scroll-behavior:smooth}
 .pipe{position:relative;height:40px}
 .pipe .track,.pipe .flow{position:absolute;left:12.5%;right:12.5%;top:50%;height:2px;margin-top:-1px}
 .pipe .track{background:var(--variant)}
-.pipe .flow{background:var(--accent);transform:scaleX(0);transform-origin:left center}
-.process.go .flow{animation:draw 1.5s .2s ease-out forwards}
-@keyframes draw{to{transform:scaleX(1)}}
-.pipe .node{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--accent);opacity:0;transform:scale(0)}
-.process.go .node{animation:pop .4s ease forwards,pulseGlow 2s ease-in-out infinite}
-.pipe .n1{left:12.5%;animation-delay:.4s,.8s}.pipe .n2{left:37.5%;animation-delay:.7s,1.1s}.pipe .n3{left:62.5%;animation-delay:1s,1.4s}
-.pipe .n4{left:87.5%;animation-delay:1.3s,1.7s;width:20px;height:20px;margin:-10px 0 0 -10px;border:3px solid var(--surface);outline:2px solid var(--accent)}
-@keyframes pop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+.pipe .flow{background:var(--accent);transform:scaleX(var(--p,0));transform-origin:left center}
+.pipe .node{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--variant);opacity:.6;transform:scale(.55);transition:opacity .3s,transform .35s cubic-bezier(.34,1.56,.64,1),background .3s}
+.pipe .node.on{opacity:1;transform:scale(1);background:var(--accent);animation:pulseGlow 2s ease-in-out infinite}
+.pipe .n1{left:12.5%}.pipe .n2{left:37.5%}.pipe .n3{left:62.5%}
+.pipe .n4{left:87.5%;width:20px;height:20px;margin:-10px 0 0 -10px;border:3px solid var(--surface)}
+.pipe .n4.on{outline:2px solid var(--accent)}
 @keyframes pulseGlow{0%,100%{box-shadow:0 0 6px rgba(255,193,108,.35)}50%{box-shadow:0 0 18px rgba(255,193,108,.75)}}
 .stages{display:grid;grid-template-columns:repeat(4,1fr);margin-top:6px}
 .stage{text-align:center}
-.stage .n{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--sec)}
-.stage .l{font-family:'Oswald',sans-serif;font-weight:500;text-transform:uppercase;font-size:clamp(.85rem,2vw,1.35rem);letter-spacing:.03em;margin-top:2px}
-.stage:last-child .n{color:var(--accent);font-weight:700}
-.stage:last-child .l{color:var(--accent)}
+.stage .n{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--sec);opacity:.55;transition:opacity .3s,color .3s}
+.stage .l{font-family:'Oswald',sans-serif;font-weight:500;text-transform:uppercase;font-size:clamp(.85rem,2vw,1.35rem);letter-spacing:.03em;margin-top:2px;color:var(--sec);opacity:.55;transition:opacity .3s,color .3s}
+.stage.on .n,.stage.on .l{opacity:1;color:var(--text)}
+.stage:last-child.on .n{color:var(--accent);font-weight:700}
+.stage:last-child.on .l{color:var(--accent)}
 
 /* sections */
 .sec{padding:clamp(52px,8vh,92px) 0;scroll-margin-top:64px}
@@ -433,17 +432,42 @@ function HeroPhone({ t }) {
 }
 
 /* ---------------- small components ---------------- */
+const STEP_THRESHOLDS = [0.04, 1 / 3, 2 / 3, 0.97];
+
 function Process({ stages }) {
   const ref = useRef(null);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const io = new IntersectionObserver(
-      (es) => es.forEach((e) => { if (e.isIntersecting) { el.classList.add("go"); io.disconnect(); } }),
-      { threshold: 0.3 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
+    const nodes = el.querySelectorAll(".node");
+    const stageEls = el.querySelectorAll(".stage");
+    const setAll = (p) => {
+      el.style.setProperty("--p", p.toFixed(4));
+      nodes.forEach((n, i) => n.classList.toggle("on", p >= STEP_THRESHOLDS[i]));
+      stageEls.forEach((s, i) => s.classList.toggle("on", p >= STEP_THRESHOLDS[i]));
+    };
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setAll(1);
+      return;
+    }
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const r = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      /* 0 when the strip enters the viewport bottom, 1 when its top reaches ~20% vh */
+      const p = Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.8)));
+      setAll(p);
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    update();
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
   }, []);
   return (
     <div className="process" ref={ref} aria-hidden="true">
