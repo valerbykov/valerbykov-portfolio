@@ -52,11 +52,13 @@ const T = {
     caseShotsLabel: "App screenshots — scroll horizontally",
     caseShots: [
       "League board & members",
+      "Tournaments: Americano, King of the Court",
       "Tournament rounds, live score",
-      "Score entry",
-      "League analytics",
-      "Player profile & form",
-      "Tournament finale",
+      "Live match & score entry",
+      "League analytics: activity pulse",
+      "League analytics: duos & milestones",
+      "Player profile: rating & form",
+      "Match history",
     ],
     caseBlocks: [
       ["The problem", "Manual scheduling, results scattered across chats, and no single source of truth for standings. It didn't scale past a handful of players."],
@@ -116,11 +118,13 @@ const T = {
     caseShotsLabel: "Скриншоты приложения — прокрутка по горизонтали",
     caseShots: [
       "Доска лиги и участники",
+      "Турниры: американо, King of the Court",
       "Раунды турнира, живой счёт",
-      "Ввод результата",
-      "Аналитика лиги",
-      "Профиль игрока и форма",
-      "Финал турнира",
+      "Живой матч и ввод счёта",
+      "Аналитика лиги: пульс активности",
+      "Аналитика лиги: дуэты и цели",
+      "Профиль игрока: рейтинг и форма",
+      "История матчей",
     ],
     caseBlocks: [
       ["Проблема", "Расписание вручную, результаты разбросаны по чатам, нет единого источника правды по рейтингам. Дальше горстки игроков это не масштабировалось."],
@@ -140,7 +144,16 @@ const TELEGRAM_URL = "https://t.me/valerbykov";
 /* fill in when the profile is live; empty string hides the link */
 const UPWORK_URL = "";
 
-const SHOTS = [1, 2, 3, 4, 5, 7].map((n) => `/shot${n}.jpg`);
+const SHOTS = [
+  "/shot-friends.jpg",
+  "/shot-cups.jpg",
+  "/shot-americano.jpg",
+  "/shot-gamelive.jpg",
+  "/shot-league-analytics-1.jpg",
+  "/shot-league-analytics-2.jpg",
+  "/shot-profile.jpg",
+  "/shot-history.jpg",
+];
 
 /* ---------------- styles · Obsidian Kinetic ---------------- */
 const css = `
@@ -316,7 +329,7 @@ html{scroll-behavior:smooth}
 .shots:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 .shot{flex:0 0 auto;width:min(230px,66vw);scroll-snap-align:start;margin:0}
 .shot .sh-frame{border:1px solid var(--line);background:var(--surface-deep);padding:8px;border-radius:24px;transition:transform .3s,border-color .3s}
-.shot .sh-frame img{display:block;width:100%;height:auto;aspect-ratio:562/1232;object-fit:cover;border-radius:16px}
+.shot .sh-frame img{display:block;width:100%;height:auto;aspect-ratio:562/1280;object-fit:cover;border-radius:16px}
 .shot:hover .sh-frame{transform:translateY(-4px);border-color:var(--line-strong)}
 .shot-cap{margin-top:10px;font-size:.82rem;color:var(--sec)}
 .shot-cap .cn{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--accent);margin-right:7px}
@@ -608,7 +621,7 @@ function Home({ t, go }) {
               </div>
               <div className="phone" aria-hidden="true">
                 <div className="notch" />
-                <img src="/shot2.jpg" alt="" width="562" height="1232" loading="lazy" decoding="async" />
+                <img src="/shot-gamelive.jpg" alt="" width="562" height="1280" loading="lazy" decoding="async" />
               </div>
             </div>
           </div>
@@ -672,7 +685,7 @@ function Padel({ t, go }) {
           {SHOTS.map((src, i) => (
             <figure className="shot" key={src}>
               <div className="sh-frame">
-                <img src={src} alt={`PadelPack — ${t.caseShots[i]}`} width="562" height="1232" loading="lazy" decoding="async" />
+                <img src={src} alt={`PadelPack — ${t.caseShots[i]}`} width="562" height="1280" loading="lazy" decoding="async" />
               </div>
               <figcaption className="shot-cap"><span className="cn">0{i + 1}</span>{t.caseShots[i]}</figcaption>
             </figure>
